@@ -29,6 +29,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceEvent;
@@ -47,6 +48,7 @@ public class ChatPart {
 	private Label lblNewLabel;
 	private Text txtServer;
 	private Button btnConnect;
+	private String lastMessage;
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -106,7 +108,8 @@ public class ChatPart {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				publish(txtHandle.getText() + ": " + txtMessage.getText() + "\r\n");
+				publish(txtHandle.getText() + ": " + txtMessage.getText()
+						+ "\r\n");
 			}
 
 			@Override
@@ -126,14 +129,27 @@ public class ChatPart {
 					public void serviceChanged(ServiceEvent event) {
 						ServiceReference<?> reference = event
 								.getServiceReference();
-						Object service = FrameworkUtil.getBundle(getClass())
-								.getBundleContext().getService(reference);
+						final Object service = FrameworkUtil
+								.getBundle(getClass()).getBundleContext()
+								.getService(reference);
 						if (event.getType() == event.REGISTERED) {
 							System.out.println("Registered: "
 									+ service.getClass().getSimpleName());
 							if (service instanceof IChatMessage) {
-								text.setText(((IChatMessage) service)
-										.getMessage() + text.getText());
+								Display.getDefault().asyncExec(new Runnable() {
+
+									@Override
+									public void run() {
+										if (!((IChatMessage) service)
+												.getMessage().equals(
+														lastMessage)) {
+											lastMessage = ((IChatMessage) service)
+													.getMessage();
+											text.setText(lastMessage
+													+ text.getText());
+										}
+									}
+								});
 							}
 						}
 						if (event.getType() == event.UNREGISTERING) {

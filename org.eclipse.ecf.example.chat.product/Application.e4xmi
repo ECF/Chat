@@ -1,23 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7M_kDAsEeO-EucSHMJFXw" elementId="org.eclipse.e4.ide.application" bindingContexts="_s7M_mTAsEeO-EucSHMJFXw">
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_s7M_kTAsEeO-EucSHMJFXw" label="org.eclipse.ecf.example.chat.product" width="500" height="400">
+<application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmi:id="_s7M_kDAsEeO-EucSHMJFXw" elementId="org.eclipse.e4.ide.application" bindingContexts="_s7M_mTAsEeO-EucSHMJFXw">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_s7M_kTAsEeO-EucSHMJFXw" label="ECF Remote Services Chat" width="500" height="400">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_s7NmtDAsEeO-EucSHMJFXw">
       <children xsi:type="advanced:Perspective" xmi:id="_s7NmtTAsEeO-EucSHMJFXw">
-        <children xsi:type="basic:PartSashContainer" xmi:id="_s7NmtjAsEeO-EucSHMJFXw">
-          <children xsi:type="basic:PartStack" xmi:id="_s7NmtzAsEeO-EucSHMJFXw">
-            <children xsi:type="basic:Part" xmi:id="_s7NmuDAsEeO-EucSHMJFXw" contributionURI="bundleclass://org.eclipse.ecf.example.chat.product/org.eclipse.ecf.example.chat.product.parts.ChatPart" label="Sample Part"/>
-          </children>
+        <children xsi:type="basic:Part" xmi:id="_gtTQsDEbEeO1IdK9rVG5yA" elementId="org.eclipse.ecf.example.chat.product.part.0" contributionURI="bundleclass://org.eclipse.ecf.example.chat.product/org.eclipse.ecf.example.chat.product.parts.ChatPart" closeable="true">
+          <toolbar xmi:id="_tfUxsDEbEeO1IdK9rVG5yA" elementId="org.eclipse.ecf.example.chat.product.toolbar.0"/>
         </children>
       </children>
     </children>
-    <mainMenu xmi:id="_s7NmrTAsEeO-EucSHMJFXw" elementId="menu:org.eclipse.ui.main.menu">
-      <children xsi:type="menu:Menu" xmi:id="_s7NmrjAsEeO-EucSHMJFXw" label="File">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_s7NmsTAsEeO-EucSHMJFXw" label="Quit" command="_s7NmoDAsEeO-EucSHMJFXw"/>
-      </children>
-      <children xsi:type="menu:Menu" xmi:id="_s7NmsjAsEeO-EucSHMJFXw" label="Help">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_s7NmszAsEeO-EucSHMJFXw" label="About" command="_s7NmqjAsEeO-EucSHMJFXw"/>
-      </children>
-    </mainMenu>
   </children>
   <handlers xmi:id="_s7NmoTAsEeO-EucSHMJFXw" elementId="org.eclipse.ecf.example.chat.product.handler.quitCommand" contributionURI="bundleclass://org.eclipse.ecf.example.chat.product/org.eclipse.ecf.example.chat.product.handlers.QuitHandler" command="_s7NmoDAsEeO-EucSHMJFXw"/>
   <handlers xmi:id="_s7NmqzAsEeO-EucSHMJFXw" elementId="org.eclipse.ecf.example.chat.product.handler.aboutCommand" contributionURI="bundleclass://org.eclipse.ecf.example.chat.product/org.eclipse.ecf.example.chat.product.handlers.AboutHandler" command="_s7NmqjAsEeO-EucSHMJFXw"/>

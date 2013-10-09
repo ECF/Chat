@@ -10,11 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ecf.example.chat.product.handlers;
 
-import java.lang.reflect.InvocationTargetException;
-
 import javax.inject.Named;
 
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.IWorkbench;

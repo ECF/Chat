@@ -23,6 +23,7 @@ import org.eclipse.ecf.core.IContainer;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.provider.zookeeper.core.ZooDiscoveryContainerInstantiator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -30,15 +31,15 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.util.tracker.ServiceTracker;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.events.SelectionAdapter;
 
 public class ChatPart {
 	private Text txtMessage;
@@ -51,7 +52,7 @@ public class ChatPart {
 	private String lastMessage;
 
 	@PostConstruct
-	public void createComposite(Composite parent) {
+	public void createComposite(Composite parent) throws InvalidSyntaxException {
 		GridLayout gl_parent = new GridLayout();
 		gl_parent.numColumns = 3;
 		parent.setLayout(gl_parent);
@@ -120,19 +121,19 @@ public class ChatPart {
 		setupTracker();
 	}
 
-	private void setupTracker() {
+	private void setupTracker() throws InvalidSyntaxException {
 
 		FrameworkUtil.getBundle(getClass()).getBundleContext()
 				.addServiceListener(new ServiceListener() {
 
 					@Override
 					public void serviceChanged(ServiceEvent event) {
-						ServiceReference<?> reference = event
+						final ServiceReference<?> reference = event
 								.getServiceReference();
 						final Object service = FrameworkUtil
 								.getBundle(getClass()).getBundleContext()
 								.getService(reference);
-						if (event.getType() == event.REGISTERED) {
+						if (event.getType() == ServiceEvent.REGISTERED) {
 							System.out.println("Registered: "
 									+ service.getClass().getSimpleName());
 							if (service instanceof IChatMessage) {
@@ -152,14 +153,15 @@ public class ChatPart {
 								});
 							}
 						}
-						if (event.getType() == event.UNREGISTERING) {
+						if (event.getType() == ServiceEvent.UNREGISTERING) {
 							System.out.println("UnRegistered: "
 									+ service.getClass().getSimpleName());
 						}
 					}
-				});
+				}, "(" + Constants.OBJECTCLASS + "=" + IChatMessage.class.getName() + ")");
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void publish(String message) {
 
 		// get rid of the previous message

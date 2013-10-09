@@ -131,5 +131,10 @@
       <feature id="org.eclipse.platform"/>
    </features>
 
+   <configurations>
+      <plugin id="org.eclipse.ecf.osgi.services.distribution" autoStart="true" startLevel="4" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
+   </configurations>
 
 </product>

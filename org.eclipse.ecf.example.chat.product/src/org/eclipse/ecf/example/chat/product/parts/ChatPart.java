@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ecf.example.chat.product.parts;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
@@ -65,7 +67,7 @@ public class ChatPart {
 	private SashForm sashForm;
 
 	@PostConstruct
-	public void createComposite(final Composite parent) {
+	public void createComposite(final Composite parent) throws UnknownHostException {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		fStackComposite = new Composite(parent, SWT.NONE);
@@ -93,6 +95,8 @@ public class ChatPart {
 		fFormToolkit.createLabel(loginBody, "Handle", SWT.NONE);
 
 		fHandle = fFormToolkit.createText(loginBody, "", SWT.NONE);
+		fHandle.setText(System.getProperty("user.name", "nobody") + "@"
+				+ InetAddress.getLocalHost().getCanonicalHostName());
 		fHandle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 
 		Label lblPort = fFormToolkit.createLabel(loginBody, "Port", SWT.NONE);

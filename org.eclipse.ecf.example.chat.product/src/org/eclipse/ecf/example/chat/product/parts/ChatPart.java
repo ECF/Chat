@@ -64,7 +64,6 @@ public class ChatPart {
 	private Text fServer;
 	private Text fHandle;
 	private Text fMessageBoard;
-	private Text fPort;
 	private ScrolledForm fmessageForm;
 	private Text fParticipants;
 	private List<String> fParticipantsList = new ArrayList<String>();
@@ -103,13 +102,6 @@ public class ChatPart {
 				+ InetAddress.getLocalHost().getCanonicalHostName());
 		fHandle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 
-		Label lblPort = fFormToolkit.createLabel(loginBody, "Port", SWT.NONE);
-		lblPort.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-
-		fPort = fFormToolkit.createText(loginBody, "9278", SWT.NONE);
-		fPort.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		fFormToolkit.createLabel(loginBody, "(also useful when running multiple clients on the same host)", SWT.NONE);
 		new Label(loginBody, SWT.NONE);
 		new Label(loginBody, SWT.NONE);
 
@@ -225,8 +217,6 @@ public class ChatPart {
 		props.put("service.exported.interfaces", "*");
 		// add OSGi service property specifying config
 		props.put("service.exported.configs", "ecf.r_osgi.peer");
-		// add ECF service property specifying container factory args
-		props.put("ecf.exported.containerfactoryargs", "r-osgi://localhost:" + fPort.getText());
 		// register remote service
 		serviceRegistration = FrameworkUtil.getBundle(getClass()).getBundleContext()
 				.registerService(IChatMessage.class.getName(), new ChatMessage(message), (Dictionary) props);

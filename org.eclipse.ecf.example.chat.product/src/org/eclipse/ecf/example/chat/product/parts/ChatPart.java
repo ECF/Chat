@@ -40,6 +40,7 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -76,6 +77,7 @@ public class ChatPart {
 	private SashForm sashForm;
 	private Table table;
 	private TableViewer tableViewer;
+	private static final Color GREY = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 
 	@PostConstruct
 	public void createComposite(final Composite parent) throws UnknownHostException {
@@ -161,7 +163,7 @@ public class ChatPart {
 		TableColumn tblclmnNewColumn = tbcDate.getColumn();
 		layout.setColumnData(tblclmnNewColumn, new ColumnWeightData(20));
 		tblclmnNewColumn.setText("Date");
-		tbcDate.setLabelProvider(new ColumnLabelProvider() {
+		tbcDate.setLabelProvider(new MyColumnLabelProvider() {
 			private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 			@Override
 			public String getText(Object element) {
@@ -173,7 +175,7 @@ public class ChatPart {
 		tblclmnNewColumn = tbcHandle.getColumn();
 		layout.setColumnData(tblclmnNewColumn, new ColumnWeightData(20));
 		tblclmnNewColumn.setText("Date");
-		tbcHandle.setLabelProvider(new ColumnLabelProvider() {
+		tbcHandle.setLabelProvider(new MyColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				return ((ChatElement) element).getHandle();
@@ -184,7 +186,7 @@ public class ChatPart {
 		tblclmnNewColumn = tbcMessage.getColumn();
 		layout.setColumnData(tblclmnNewColumn, new ColumnWeightData(640));
 		tblclmnNewColumn.setText("Message");
-		tbcMessage.setLabelProvider(new ColumnLabelProvider() {
+		tbcMessage.setLabelProvider(new MyColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				return ((ChatElement) element).getMessage();
@@ -343,6 +345,15 @@ public class ChatPart {
 									+ fServer.getText() }), null);
 		} catch (Exception doesNotHappen) {
 			doesNotHappen.printStackTrace();
+		}
+	}
+	private class MyColumnLabelProvider extends ColumnLabelProvider {
+		@Override
+		public Color getForeground(Object element) {
+			if (((ChatElement) element).isLocal()) {
+				return GREY;
+			}
+			return super.getForeground(element);
 		}
 	}
 }

@@ -15,6 +15,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
@@ -27,6 +28,7 @@ import org.eclipse.ecf.core.IContainer;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.provider.zookeeper.core.ZooDiscoveryContainerInstantiator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -40,6 +42,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
@@ -48,8 +51,6 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.eclipse.wb.swt.ResourceManager;
-import org.eclipse.swt.custom.SashForm;
 
 public class ChatPart {
 	private Text fMessage;
@@ -63,7 +64,7 @@ public class ChatPart {
 	private Text fPort;
 	private ScrolledForm fmessageForm;
 	private Text fParticipants;
-	private ArrayList<String> fParticipantsList = new ArrayList<String>();
+	private List<String> fParticipantsList = new ArrayList<String>();
 	private SashForm sashForm;
 
 	@PostConstruct
@@ -196,7 +197,8 @@ public class ChatPart {
 					}
 				}
 			}, "(" + Constants.OBJECTCLASS + "=" + IChatMessage.class.getName() + ")");
-		} catch (InvalidSyntaxException e) {
+		} catch (InvalidSyntaxException dosNotHappen) {
+			dosNotHappen.printStackTrace();
 		}
 	}
 
@@ -260,7 +262,8 @@ public class ChatPart {
 		IContainer singleton = null;
 		try {
 			singleton = ContainerFactory.getDefault().createContainer(ZooDiscoveryContainerInstantiator.NAME);
-		} catch (ContainerCreateException e1) {
+		} catch (ContainerCreateException doesNotHappen) {
+			doesNotHappen.printStackTrace();
 		}
 		if (singleton.getConnectedID() != null)
 			singleton.disconnect();
@@ -268,7 +271,8 @@ public class ChatPart {
 			singleton.connect(
 					singleton.getConnectNamespace().createInstance(
 							new String[] { "zoodiscovery.flavor.centralized=" + fServer.getText() }), null);
-		} catch (Exception e) {
+		} catch (Exception doesNotHappen) {
+			doesNotHappen.printStackTrace();
 		}
 	}
 }

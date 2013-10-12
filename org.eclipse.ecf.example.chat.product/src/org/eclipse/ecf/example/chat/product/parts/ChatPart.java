@@ -152,7 +152,7 @@ public class ChatPart {
 		btnSend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				publish(fHandle.getText() + ": " + fMessage.getText() + "\r\n");
+				publish(fMessage.getText() + "\r\n", fHandle.getText());
 				fMessage.setText("");
 				fMessage.setFocus();
 			}
@@ -176,17 +176,18 @@ public class ChatPart {
 					if (event.getType() == ServiceEvent.REGISTERED) {
 						System.out.println("Registered: " + service.getClass().getSimpleName());
 						if (service instanceof IChatMessage) {
-							if (!((IChatMessage) service).getMessage().equals(fLastMessage)) {
+							final IChatMessage iChatMessage = (IChatMessage) service;
+							if (!iChatMessage.getMessage().equals(fLastMessage)) {
 								fLastMessage = ((IChatMessage) service).getMessage();
 								Display.getDefault().asyncExec(new Runnable() {
 									@Override
 									public void run() {
-										fMessageBoard.setText("[" + formatter.format(new Date()) + "] " + fLastMessage + fMessageBoard.getText());
+										fMessageBoard.setText("[" + formatter.format(new Date()) + "] " + fLastMessage + "\n" + fMessageBoard.getText());
 										// Local messages should have a visible indication
 										if (reference.getProperty("endpoint.id") == null) {
 											fMessageBoard.setText("L" + fMessageBoard.getText());
 										}
-										processParticipantsList(fLastMessage.split(":")[0]);
+										processParticipantsList(iChatMessage.getHandle());
 									}
 								});
 							}
@@ -203,7 +204,7 @@ public class ChatPart {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected void publish(String message) {
+	protected void publish(String message, String handle) {
 
 		// get rid of the previous message
 		disposeServiceRegistration();
@@ -219,7 +220,7 @@ public class ChatPart {
 		props.put("service.exported.configs", "ecf.r_osgi.peer");
 		// register remote service
 		serviceRegistration = FrameworkUtil.getBundle(getClass()).getBundleContext()
-				.registerService(IChatMessage.class.getName(), new ChatMessage(message), (Dictionary) props);
+				.registerService(IChatMessage.class.getName(), new ChatMessage(message, handle), (Dictionary) props);
 	}
 
 	private void disposeServiceRegistration() {

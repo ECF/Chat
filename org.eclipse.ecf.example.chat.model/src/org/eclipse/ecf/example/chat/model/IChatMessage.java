@@ -23,4 +23,5 @@ public interface IChatMessage {
 	 */
 	public String getMessage();
 
+	public String getHandle();
 }

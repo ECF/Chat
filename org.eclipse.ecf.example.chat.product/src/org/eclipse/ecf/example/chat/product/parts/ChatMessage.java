@@ -5,9 +5,18 @@ import org.eclipse.ecf.example.chat.model.IChatMessage;
 public class ChatMessage implements IChatMessage {
 
 	private String message;
+	private String handle;
 
-	public ChatMessage(String message) {
+	/**
+	 * @return the handle
+	 */
+	public String getHandle() {
+		return handle;
+	}
+
+	public ChatMessage(String message, String handle) {
 		this.message = message;
+		this.handle = handle;
 	}
 
 	@Override

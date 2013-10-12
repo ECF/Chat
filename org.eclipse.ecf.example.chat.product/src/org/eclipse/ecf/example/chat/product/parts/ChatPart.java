@@ -179,7 +179,7 @@ public class ChatPart {
 
 				@Override
 				public void serviceChanged(ServiceEvent event) {
-					ServiceReference<?> reference = event.getServiceReference();
+					final ServiceReference<?> reference = event.getServiceReference();
 					final Object service = FrameworkUtil.getBundle(getClass()).getBundleContext().getService(reference);
 					if (event.getType() == ServiceEvent.REGISTERED) {
 						System.out.println("Registered: " + service.getClass().getSimpleName());
@@ -190,6 +190,10 @@ public class ChatPart {
 									@Override
 									public void run() {
 										fMessageBoard.setText("[" + formatter.format(new Date()) + "] " + fLastMessage + fMessageBoard.getText());
+										// Local messages should have a visible indication
+										if (reference.getProperty("endpoint.id") == null) {
+											fMessageBoard.setText("L" + fMessageBoard.getText());
+										}
 										processParticipantsList(fLastMessage.split(":")[0]);
 									}
 								});

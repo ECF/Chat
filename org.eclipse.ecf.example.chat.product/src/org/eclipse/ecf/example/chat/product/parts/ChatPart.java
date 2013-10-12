@@ -77,7 +77,6 @@ public class ChatPart {
 	private SashForm sashForm;
 	private Table table;
 	private TableViewer tableViewer;
-	private static final Color GREY = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 
 	@PostConstruct
 	public void createComposite(final Composite parent) throws UnknownHostException {
@@ -347,7 +346,8 @@ public class ChatPart {
 			doesNotHappen.printStackTrace();
 		}
 	}
-	private class MyColumnLabelProvider extends ColumnLabelProvider {
+	private static class MyColumnLabelProvider extends ColumnLabelProvider {
+		private static final Color GREY = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 		@Override
 		public Color getForeground(Object element) {
 			if (((ChatElement) element).isLocal()) {

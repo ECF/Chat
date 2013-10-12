@@ -8,7 +8,7 @@
 
    <launcherArgs>
       <programArgs>-clearPersistedState -console -consolelog</programArgs>
-      <vmArgs>-Dlog4j.configuration=file:/C:\Users\jongw\git\ChatClient\org.eclipse.ecf.example.chat.feature\log4j.properties
+      <vmArgs>-DOFFlog4j.configuration=file:/C:\Users\jongw\git\ChatClient\org.eclipse.ecf.example.chat.feature\log4j.properties
 -Dch.ethz.iks.r_osgi.debug.messages=true</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
@@ -118,6 +118,7 @@
 
    <features>
       <feature id="org.eclipse.e4.rcp"/>
+      <feature id="org.eclipse.platform"/>
       <feature id="org.eclipse.emf.ecore"/>
       <feature id="org.eclipse.emf.common"/>
       <feature id="org.eclipse.ecf.discovery.zookeeper.feature"/>
@@ -128,7 +129,6 @@
       <feature id="org.eclipse.ecf.server.generic.feature"/>
       <feature id="org.eclipse.ecf.osgi.services.feature"/>
       <feature id="org.eclipse.ecf.core.feature"/>
-      <feature id="org.eclipse.platform"/>
    </features>
 
    <configurations>

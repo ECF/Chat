@@ -12,8 +12,11 @@ package org.eclipse.ecf.example.chat.product.parts;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Properties;
@@ -172,6 +175,7 @@ public class ChatPart {
 
 		try {
 			FrameworkUtil.getBundle(getClass()).getBundleContext().addServiceListener(new ServiceListener() {
+				private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
 				@Override
 				public void serviceChanged(ServiceEvent event) {
@@ -185,7 +189,7 @@ public class ChatPart {
 								Display.getDefault().asyncExec(new Runnable() {
 									@Override
 									public void run() {
-										fMessageBoard.setText(fLastMessage + fMessageBoard.getText());
+										fMessageBoard.setText("[" + formatter.format(new Date()) + "] " + fLastMessage + fMessageBoard.getText());
 										processParticipantsList(fLastMessage.split(":")[0]);
 									}
 								});

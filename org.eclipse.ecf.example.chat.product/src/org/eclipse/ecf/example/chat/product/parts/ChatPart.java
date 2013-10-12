@@ -14,11 +14,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
@@ -66,7 +66,7 @@ public class ChatPart {
 	private Text fMessageBoard;
 	private ScrolledForm fmessageForm;
 	private Text fParticipants;
-	private List<String> fParticipantsList = new ArrayList<String>();
+	private Map<Object, String> fParticipantsList = new HashMap<Object, String>();
 	private SashForm sashForm;
 
 	@PostConstruct
@@ -112,7 +112,8 @@ public class ChatPart {
 				startZookeeper();
 				stackLayout.topControl = fmessageForm;
 				fStackComposite.layout();
-				processParticipantsList(fHandle.getText());
+				// Object is any key
+				processParticipantsList(new Object(), fHandle.getText());
 			}
 		});
 		btnLogin.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -187,7 +188,7 @@ public class ChatPart {
 										if (reference.getProperty("endpoint.id") == null) {
 											fMessageBoard.setText("L" + fMessageBoard.getText());
 										}
-										processParticipantsList(iChatMessage.getHandle());
+										processParticipantsList(reference, iChatMessage.getHandle());
 									}
 								});
 							}
@@ -195,6 +196,14 @@ public class ChatPart {
 					}
 					if (event.getType() == ServiceEvent.UNREGISTERING) {
 						System.out.println("UnRegistered: " + service.getClass().getSimpleName());
+						final ServiceReference<?> ref = event.getServiceReference();
+						Display.getDefault().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								removeFromParticipantList(ref);
+							}
+
+						});
 					}
 				}
 			}, "(&(" + Constants.OBJECTCLASS + "=" + IChatMessage.class.getName() + ") (| (service.exported.interfaces=*) (endpoint.id=*) ) )");
@@ -230,11 +239,25 @@ public class ChatPart {
 		}
 	}
 
-	private void processParticipantsList(String participant) {
-		if (!fParticipantsList.contains(participant)) {
-			fParticipantsList.add(participant);
+	private synchronized void processParticipantsList(Object key, String participant) {
+		if (!fParticipantsList.containsKey(key)) {
+			fParticipantsList.put(key, participant);
 			String[] participants = new String[fParticipantsList.size()];
-			fParticipantsList.toArray(participants);
+			fParticipantsList.values().toArray(participants);
+			Arrays.sort(participants);
+			StringBuilder result = new StringBuilder();
+			for (String user : participants) {
+				result.append(user).append("\r\n");
+			}
+			fParticipants.setText(result.toString());
+		}
+	}
+	
+	private synchronized void removeFromParticipantList(Object key) {
+		if (fParticipantsList.containsKey(key)) {
+			fParticipantsList.remove(key);
+			String[] participants = new String[fParticipantsList.size()];
+			fParticipantsList.values().toArray(participants);
 			Arrays.sort(participants);
 			StringBuilder result = new StringBuilder();
 			for (String user : participants) {

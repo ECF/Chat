@@ -204,7 +204,7 @@ public class ChatPart {
 						System.out.println("UnRegistered: " + service.getClass().getSimpleName());
 					}
 				}
-			}, "(" + Constants.OBJECTCLASS + "=" + IChatMessage.class.getName() + ")");
+			}, "(&(" + Constants.OBJECTCLASS + "=" + IChatMessage.class.getName() + ") (| (service.exported.interfaces=*) (endpoint.id=*) ) )");
 		} catch (InvalidSyntaxException dosNotHappen) {
 			dosNotHappen.printStackTrace();
 		}

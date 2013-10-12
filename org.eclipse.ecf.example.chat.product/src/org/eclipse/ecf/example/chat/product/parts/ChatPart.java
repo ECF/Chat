@@ -25,11 +25,16 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.eclipse.e4.ui.di.Focus;
-import org.eclipse.ecf.core.ContainerCreateException;
 import org.eclipse.ecf.core.ContainerFactory;
 import org.eclipse.ecf.core.IContainer;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.provider.zookeeper.core.ZooDiscoveryContainerInstantiator;
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
@@ -42,6 +47,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -63,11 +70,12 @@ public class ChatPart {
 	private final FormToolkit fFormToolkit = new FormToolkit(Display.getDefault());
 	private Text fServer;
 	private Text fHandle;
-	private Text fMessageBoard;
 	private ScrolledForm fmessageForm;
 	private Text fParticipants;
 	private Map<Object, String> fParticipantsList = new HashMap<Object, String>();
 	private SashForm sashForm;
+	private Table table;
+	private TableViewer tableViewer;
 
 	@PostConstruct
 	public void createComposite(final Composite parent) throws UnknownHostException {
@@ -135,9 +143,53 @@ public class ChatPart {
 		sashForm = new SashForm(messageBody, SWT.SMOOTH);
 		fFormToolkit.adapt(sashForm);
 		fFormToolkit.paintBordersFor(sashForm);
+		
+		Composite tableComposite = new Composite(sashForm, SWT.NONE);
+		tableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+				true, 2, 1));
+		TableColumnLayout layout = new TableColumnLayout();
+		tableComposite.setLayout(layout);
 
-		fMessageBoard = fFormToolkit.createText(sashForm, "", SWT.READ_ONLY | SWT.MULTI);
-		fMessageBoard.setFont(SWTResourceManager.getFont("Consolas", 12, SWT.BOLD));
+		tableViewer = new TableViewer(tableComposite, SWT.BORDER);
+		table = tableViewer.getTable();
+		table.setHeaderVisible(true);
+		table.setLinesVisible(false);
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		
+		TableViewerColumn tbcDate = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnNewColumn = tbcDate.getColumn();
+		layout.setColumnData(tblclmnNewColumn, new ColumnWeightData(20));
+		tblclmnNewColumn.setText("Date");
+		tbcDate.setLabelProvider(new ColumnLabelProvider() {
+			private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+			@Override
+			public String getText(Object element) {
+				return formatter.format(((ChatElement) element).getDate());
+			}
+		});
+
+		TableViewerColumn tbcHandle = new TableViewerColumn(tableViewer, SWT.NONE);
+		tblclmnNewColumn = tbcHandle.getColumn();
+		layout.setColumnData(tblclmnNewColumn, new ColumnWeightData(20));
+		tblclmnNewColumn.setText("Date");
+		tbcHandle.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((ChatElement) element).getHandle();
+			}
+		});
+	
+		TableViewerColumn tbcMessage = new TableViewerColumn(tableViewer, SWT.NONE);
+		tblclmnNewColumn = tbcMessage.getColumn();
+		layout.setColumnData(tblclmnNewColumn, new ColumnWeightData(640));
+		tblclmnNewColumn.setText("Message");
+		tbcMessage.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((ChatElement) element).getMessage();
+			}
+		});
 
 		fParticipants = fFormToolkit.createText(sashForm, "New Text", SWT.READ_ONLY | SWT.MULTI);
 		fParticipants.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE));
@@ -168,7 +220,6 @@ public class ChatPart {
 
 		try {
 			FrameworkUtil.getBundle(getClass()).getBundleContext().addServiceListener(new ServiceListener() {
-				private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
 				@Override
 				public void serviceChanged(ServiceEvent event) {
@@ -183,11 +234,8 @@ public class ChatPart {
 								Display.getDefault().asyncExec(new Runnable() {
 									@Override
 									public void run() {
-										fMessageBoard.setText("[" + formatter.format(new Date()) + "] " + fLastMessage + "\n" + fMessageBoard.getText());
-										// Local messages should have a visible indication
-										if (reference.getProperty("endpoint.id") == null) {
-											fMessageBoard.setText("L" + fMessageBoard.getText());
-										}
+										boolean isLocal = (reference.getProperty("endpoint.id") == null);
+										tableViewer.add(new ChatElement(fLastMessage, iChatMessage.getHandle(), new Date(), isLocal));
 										processParticipantsList(reference, iChatMessage.getHandle());
 									}
 								});

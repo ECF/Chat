@@ -280,19 +280,19 @@ public class ChatPart {
 		fMessage.setFocus();
 	}
 
+
+	// FIXME Discovery providers should get configured via OSGi Config Admin
 	protected void startZookeeper() {
-		IContainer singleton = null;
 		try {
-			singleton = ContainerFactory.getDefault().createContainer(ZooDiscoveryContainerInstantiator.NAME);
-		} catch (ContainerCreateException doesNotHappen) {
-			doesNotHappen.printStackTrace();
-		}
-		if (singleton.getConnectedID() != null)
-			singleton.disconnect();
-		try {
+			final IContainer singleton = ContainerFactory.getDefault()
+					.createContainer(ZooDiscoveryContainerInstantiator.NAME);
+			if (singleton.getConnectedID() != null) {
+				singleton.disconnect();
+			}
 			singleton.connect(
 					singleton.getConnectNamespace().createInstance(
-							new String[] { "zoodiscovery.flavor.centralized=" + fServer.getText() }), null);
+							new String[] { "zoodiscovery.flavor.centralized="
+									+ fServer.getText() }), null);
 		} catch (Exception doesNotHappen) {
 			doesNotHappen.printStackTrace();
 		}

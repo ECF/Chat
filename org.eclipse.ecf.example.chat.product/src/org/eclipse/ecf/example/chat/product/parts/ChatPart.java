@@ -87,6 +87,7 @@ public class ChatPart {
 
 		fServer = fFormToolkit.createText(loginBody, "", SWT.NONE);
 		fServer.setText("disco.ecf-project.org");
+		fServer.selectAll();
 		fServer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
 		fFormToolkit.createLabel(loginBody, "Handle", SWT.NONE);

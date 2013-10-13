@@ -7,7 +7,7 @@
    </configIni>
 
    <launcherArgs>
-      <programArgs>-clearPersistedState -console -consolelog</programArgs>
+      <programArgs>-clearPersistedState</programArgs>
       <vmArgs>-DOFFlog4j.configuration=file:/C:\Users\jongw\git\ChatClient\org.eclipse.ecf.example.chat.feature\log4j.properties</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
@@ -131,6 +131,7 @@
    </features>
 
    <configurations>
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.ecf.osgi.services.distribution" autoStart="true" startLevel="4" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />

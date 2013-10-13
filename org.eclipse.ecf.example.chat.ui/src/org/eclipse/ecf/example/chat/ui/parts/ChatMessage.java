@@ -1,4 +1,4 @@
-package org.eclipse.ecf.example.chat.product.parts;
+package org.eclipse.ecf.example.chat.ui.parts;
 
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 

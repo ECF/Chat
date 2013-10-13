@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ecf.example.chat.product.handlers;
+package org.eclipse.ecf.example.chat.ui.handlers;
 
 import javax.inject.Named;
 

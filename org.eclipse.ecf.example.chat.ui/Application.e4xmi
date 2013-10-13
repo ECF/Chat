@@ -3,14 +3,14 @@
   <children xsi:type="basic:TrimmedWindow" xmi:id="_s7M_kTAsEeO-EucSHMJFXw" label="ECF Remote Services Chat" width="500" height="400">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_s7NmtDAsEeO-EucSHMJFXw">
       <children xsi:type="advanced:Perspective" xmi:id="_s7NmtTAsEeO-EucSHMJFXw">
-        <children xsi:type="basic:Part" xmi:id="_gtTQsDEbEeO1IdK9rVG5yA" elementId="org.eclipse.ecf.example.chat.product.part.0" contributionURI="bundleclass://org.eclipse.ecf.example.chat.product/org.eclipse.ecf.example.chat.product.parts.ChatPart" closeable="true">
+        <children xsi:type="basic:Part" xmi:id="_gtTQsDEbEeO1IdK9rVG5yA" elementId="org.eclipse.ecf.example.chat.ui.part.0" contributionURI="bundleclass://org.eclipse.ecf.example.chat.ui/org.eclipse.ecf.example.chat.ui.parts.ChatPart" closeable="true">
           <toolbar xmi:id="_tfUxsDEbEeO1IdK9rVG5yA" elementId="org.eclipse.ecf.example.chat.product.toolbar.0"/>
         </children>
       </children>
     </children>
   </children>
-  <handlers xmi:id="_s7NmoTAsEeO-EucSHMJFXw" elementId="org.eclipse.ecf.example.chat.product.handler.quitCommand" contributionURI="bundleclass://org.eclipse.ecf.example.chat.product/org.eclipse.ecf.example.chat.product.handlers.QuitHandler" command="_s7NmoDAsEeO-EucSHMJFXw"/>
-  <handlers xmi:id="_s7NmqzAsEeO-EucSHMJFXw" elementId="org.eclipse.ecf.example.chat.product.handler.aboutCommand" contributionURI="bundleclass://org.eclipse.ecf.example.chat.product/org.eclipse.ecf.example.chat.product.handlers.AboutHandler" command="_s7NmqjAsEeO-EucSHMJFXw"/>
+  <handlers xmi:id="_s7NmoTAsEeO-EucSHMJFXw" elementId="org.eclipse.ecf.example.chat.product.handler.quitCommand" contributionURI="bundleclass://org.eclipse.ecf.example.chat.ui/org.eclipse.ecf.example.chat.ui.handlers.QuitHandler" command="_s7NmoDAsEeO-EucSHMJFXw"/>
+  <handlers xmi:id="_s7NmqzAsEeO-EucSHMJFXw" elementId="org.eclipse.ecf.example.chat.product.handler.aboutCommand" contributionURI="bundleclass://org.eclipse.ecf.example.chat.ui/org.eclipse.ecf.example.chat.ui.handlers.AboutHandler" command="_s7NmqjAsEeO-EucSHMJFXw"/>
   <bindingTables xmi:id="_s7NmojAsEeO-EucSHMJFXw" bindingContext="_s7M_mTAsEeO-EucSHMJFXw">
     <bindings xmi:id="_s7NmozAsEeO-EucSHMJFXw" keySequence="M1+Q" command="_s7NmoDAsEeO-EucSHMJFXw"/>
     <bindings xmi:id="_s7NmpjAsEeO-EucSHMJFXw" keySequence="M1+O"/>

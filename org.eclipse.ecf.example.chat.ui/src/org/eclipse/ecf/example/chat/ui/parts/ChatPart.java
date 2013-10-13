@@ -8,7 +8,7 @@
  * Contributors:
  *     Wim Jongman and Markus Kuppe 
  *******************************************************************************/
-package org.eclipse.ecf.example.chat.product.parts;
+package org.eclipse.ecf.example.chat.ui.parts;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

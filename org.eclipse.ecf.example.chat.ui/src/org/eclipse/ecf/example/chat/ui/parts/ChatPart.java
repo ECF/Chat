@@ -31,16 +31,27 @@ import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.provider.zookeeper.core.ZooDiscoveryContainerInstantiator;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -77,6 +88,8 @@ public class ChatPart {
 	private SashForm sashForm;
 	private Table table;
 	private TableViewer tableViewer;
+	private Font fBoldFont;
+	private static Color fGray;
 
 	@PostConstruct
 	public void createComposite(final Composite parent) throws UnknownHostException {
@@ -121,8 +134,6 @@ public class ChatPart {
 				startZookeeper();
 				stackLayout.topControl = fmessageForm;
 				fStackComposite.layout();
-				// Object is any key
-				processParticipantsList(new Object(), fHandle.getText());
 			}
 		});
 		btnLogin.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -144,35 +155,44 @@ public class ChatPart {
 		sashForm = new SashForm(messageBody, SWT.SMOOTH);
 		fFormToolkit.adapt(sashForm);
 		fFormToolkit.paintBordersFor(sashForm);
-		
+
 		Composite tableComposite = new Composite(sashForm, SWT.NONE);
-		tableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				true, 2, 1));
+		tableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		TableColumnLayout layout = new TableColumnLayout();
 		tableComposite.setLayout(layout);
 
-		tableViewer = new TableViewer(tableComposite, SWT.BORDER);
+		tableViewer = new TableViewer(tableComposite, SWT.BORDER | SWT.FULL_SELECTION);
 		table = tableViewer.getTable();
-		table.setHeaderVisible(true);
+		table.setHeaderVisible(false);
 		table.setLinesVisible(false);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
-		
 		TableViewerColumn tbcDate = new TableViewerColumn(tableViewer, SWT.NONE);
 		TableColumn tblclmnNewColumn = tbcDate.getColumn();
-		layout.setColumnData(tblclmnNewColumn, new ColumnWeightData(20));
+		layout.setColumnData(tblclmnNewColumn, new ColumnPixelData(60));
 		tblclmnNewColumn.setText("Date");
 		tbcDate.setLabelProvider(new MyColumnLabelProvider() {
 			private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+
 			@Override
 			public String getText(Object element) {
 				return formatter.format(((ChatElement) element).getDate());
+			}
+
+			@Override
+			public Font getFont(Object element) {
+				return null;
+			}
+
+			@Override
+			public Color getForeground(Object element) {
+				return null;
 			}
 		});
 
 		TableViewerColumn tbcHandle = new TableViewerColumn(tableViewer, SWT.NONE);
 		tblclmnNewColumn = tbcHandle.getColumn();
-		layout.setColumnData(tblclmnNewColumn, new ColumnWeightData(20));
+		layout.setColumnData(tblclmnNewColumn, new ColumnPixelData(90));
 		tblclmnNewColumn.setText("Date");
 		tbcHandle.setLabelProvider(new MyColumnLabelProvider() {
 			@Override
@@ -180,7 +200,7 @@ public class ChatPart {
 				return ((ChatElement) element).getHandle();
 			}
 		});
-	
+
 		TableViewerColumn tbcMessage = new TableViewerColumn(tableViewer, SWT.NONE);
 		tblclmnNewColumn = tbcMessage.getColumn();
 		layout.setColumnData(tblclmnNewColumn, new ColumnWeightData(640));
@@ -192,7 +212,37 @@ public class ChatPart {
 			}
 		});
 
-		fParticipants = fFormToolkit.createText(sashForm, "New Text", SWT.READ_ONLY | SWT.MULTI);
+		tbcMessage.setLabelProvider(new StyledCellLabelProvider() {
+
+			@Override
+			public void initialize(ColumnViewer viewer, ViewerColumn column) {
+				CellEditor[] editors = new CellEditor[1];
+				editors[0] = new TextCellEditor(table, SWT.WRAP);
+				viewer.setCellEditors(editors);
+				super.initialize(viewer, column);
+			}
+
+			@Override
+			public void update(ViewerCell cell) {
+				ChatElement element = (ChatElement) cell.getElement();
+				cell.setText(element.getMessage());
+				Color color = fGray;
+				if (element.getMessage().contains(fHandle.getText()))
+					color = Display.getDefault().getSystemColor(SWT.COLOR_RED);
+				if (element.isLocal() || color != fGray) {
+					TextStyle style = new TextStyle(fBoldFont, color, null);
+					StyleRange myStyledRange = new StyleRange(style);
+					myStyledRange.start = 0;
+					myStyledRange.length = cell.getText().length();
+					StyleRange[] range = { myStyledRange };
+					cell.setStyleRanges(range);
+				}
+				cell.scrollIntoView();
+				super.update(cell);
+			}
+		});
+
+		fParticipants = fFormToolkit.createText(sashForm, "", SWT.READ_ONLY | SWT.MULTI);
 		fParticipants.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE));
 		fParticipants.setFont(SWTResourceManager.getFont("Courier", 9, SWT.BOLD));
 		sashForm.setWeights(new int[] { 4, 1 });
@@ -214,48 +264,60 @@ public class ChatPart {
 		btnSend.getShell().setDefaultButton(btnSend);
 
 		stackLayout.topControl = loginForm;
+
+		FontData[] fontData = table.getFont().getFontData();
+		fontData[0].setStyle(fontData[0].getStyle() | SWT.BOLD);
+		fBoldFont = new Font(Display.getDefault(), fontData);
+
+		fGray = Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
+
 		setupTracker();
 	}
 
 	private void setupTracker() {
 
 		try {
-			FrameworkUtil.getBundle(getClass()).getBundleContext().addServiceListener(new ServiceListener() {
+			FrameworkUtil.getBundle(getClass()).getBundleContext().addServiceListener(
+					new ServiceListener() {
 
-				@Override
-				public void serviceChanged(ServiceEvent event) {
-					final ServiceReference<?> reference = event.getServiceReference();
-					final Object service = FrameworkUtil.getBundle(getClass()).getBundleContext().getService(reference);
-					if (event.getType() == ServiceEvent.REGISTERED) {
-						System.out.println("Registered: " + service.getClass().getSimpleName());
-						if (service instanceof IChatMessage) {
-							final IChatMessage iChatMessage = (IChatMessage) service;
-							if (!iChatMessage.getMessage().equals(fLastMessage)) {
-								fLastMessage = ((IChatMessage) service).getMessage();
+						@Override
+						public void serviceChanged(ServiceEvent event) {
+							final ServiceReference<?> reference = event.getServiceReference();
+							final Object service = FrameworkUtil.getBundle(getClass()).getBundleContext()
+									.getService(reference);
+							if (event.getType() == ServiceEvent.REGISTERED) {
+								System.out.println("Registered: " + service.getClass().getSimpleName());
+								if (service instanceof IChatMessage) {
+									final IChatMessage chatMessage = (IChatMessage) service;
+									if (!chatMessage.getMessage().equals(fLastMessage)) {
+										fLastMessage = ((IChatMessage) service).getMessage();
+										Display.getDefault().asyncExec(new Runnable() {
+											@Override
+											public void run() {
+												boolean isLocal = (reference.getProperty("endpoint.id") == null);
+												tableViewer.add(new ChatElement(fLastMessage, chatMessage.getHandle(),
+														new Date(), isLocal));
+												processParticipantsList(reference, chatMessage.getHandle());
+											}
+										});
+									}
+								}
+							}
+							if (event.getType() == ServiceEvent.UNREGISTERING) {
+								System.out.println("UnRegistered: " + service.getClass().getSimpleName());
+								final ServiceReference<?> ref = event.getServiceReference();
 								Display.getDefault().asyncExec(new Runnable() {
 									@Override
 									public void run() {
-										boolean isLocal = (reference.getProperty("endpoint.id") == null);
-										tableViewer.add(new ChatElement(fLastMessage, iChatMessage.getHandle(), new Date(), isLocal));
-										processParticipantsList(reference, iChatMessage.getHandle());
+										removeFromParticipantList(ref);
 									}
+
 								});
 							}
 						}
-					}
-					if (event.getType() == ServiceEvent.UNREGISTERING) {
-						System.out.println("UnRegistered: " + service.getClass().getSimpleName());
-						final ServiceReference<?> ref = event.getServiceReference();
-						Display.getDefault().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								removeFromParticipantList(ref);
-							}
-
-						});
-					}
-				}
-			}, "(&(" + Constants.OBJECTCLASS + "=" + IChatMessage.class.getName() + ") (| (service.exported.interfaces=*) (endpoint.id=*) ) )");
+					},
+					"(&(" + Constants.OBJECTCLASS + "=" + IChatMessage.class.getName()
+							+ ") (| (service.exported.interfaces=*) (endpoint.id=*) ) )");
 		} catch (InvalidSyntaxException dosNotHappen) {
 			dosNotHappen.printStackTrace();
 		}
@@ -301,8 +363,11 @@ public class ChatPart {
 			fParticipants.setText(result.toString());
 		}
 	}
-	
+
 	private synchronized void removeFromParticipantList(Object key) {
+		if (fParticipants.isDisposed()) {
+			return;
+		}
 		if (fParticipantsList.containsKey(key)) {
 			fParticipantsList.remove(key);
 			String[] participants = new String[fParticipantsList.size()];
@@ -321,6 +386,8 @@ public class ChatPart {
 		if (fFormToolkit != null) {
 			fFormToolkit.dispose();
 		}
+		if (fBoldFont != null && !fBoldFont.isDisposed())
+			fBoldFont.dispose();
 		disposeServiceRegistration();
 	}
 
@@ -329,31 +396,39 @@ public class ChatPart {
 		fMessage.setFocus();
 	}
 
-
 	// FIXME Discovery providers should get configured via OSGi Config Admin
 	protected void startZookeeper() {
 		try {
-			final IContainer singleton = ContainerFactory.getDefault()
-					.createContainer(ZooDiscoveryContainerInstantiator.NAME);
+			final IContainer singleton = ContainerFactory.getDefault().createContainer(
+					ZooDiscoveryContainerInstantiator.NAME);
 			if (singleton.getConnectedID() != null) {
 				singleton.disconnect();
 			}
 			singleton.connect(
 					singleton.getConnectNamespace().createInstance(
-							new String[] { "zoodiscovery.flavor.centralized="
-									+ fServer.getText() }), null);
+							new String[] { "zoodiscovery.flavor.centralized=" + fServer.getText() }), null);
 		} catch (Exception doesNotHappen) {
 			doesNotHappen.printStackTrace();
 		}
 	}
-	private static class MyColumnLabelProvider extends ColumnLabelProvider {
-		private static final Color GREY = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+
+	private class MyColumnLabelProvider extends ColumnLabelProvider {
+
 		@Override
 		public Color getForeground(Object element) {
 			if (((ChatElement) element).isLocal()) {
-				return GREY;
+				return fGray;
 			}
 			return super.getForeground(element);
+		}
+
+		@Override
+		public Font getFont(Object element) {
+
+			if (((ChatElement) element).isLocal()) {
+				return fBoldFont;
+			}
+			return table.getFont();
 		}
 	}
 }

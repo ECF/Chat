@@ -19,9 +19,14 @@ public interface IChatMessage {
 	/**
 	 * Gets the verbatim message.
 	 * 
-	 * @return the message, will never be null
+	 * @return the message, will not be null.
 	 */
 	public String getMessage();
 
+	/**
+	 * Gets the Handle.
+	 * 
+	 * @return the handler, will not be null.
+	 */
 	public String getHandle();
 }

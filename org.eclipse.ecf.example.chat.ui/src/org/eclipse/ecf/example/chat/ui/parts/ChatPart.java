@@ -12,12 +12,7 @@ package org.eclipse.ecf.example.chat.ui.parts;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -25,6 +20,7 @@ import javax.annotation.PreDestroy;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.ecf.core.ContainerFactory;
 import org.eclipse.ecf.core.IContainer;
+import org.eclipse.ecf.example.chat.model.IChatListener;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.provider.zookeeper.core.ZooDiscoveryContainerInstantiator;
 import org.eclipse.swt.SWT;
@@ -44,17 +40,9 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
-import org.osgi.framework.Constants;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 
-public class ChatPart {
+public class ChatPart implements IChatListener {
 	private Text fMessage;
-	private ServiceRegistration<?> serviceRegistration;
 	private String fLastMessage;
 	private Composite fStackComposite;
 	private final FormToolkit fFormToolkit = new FormToolkit(Display.getDefault());
@@ -62,9 +50,12 @@ public class ChatPart {
 	private Text fHandle;
 	private ScrolledForm fmessageForm;
 	private Text fParticipants;
-	private Map<Object, String> fParticipantsList = new HashMap<Object, String>();
 	private SashForm sashForm;
 	private MessageComposite messageComposite;
+	private Button btnPointToPoint;
+	private Button btnServer;
+	private Label lblServer;
+	private ChatTracker fTracker;
 
 	@PostConstruct
 	public void createComposite(final Composite parent) throws UnknownHostException {
@@ -99,6 +90,25 @@ public class ChatPart {
 				+ InetAddress.getLocalHost().getCanonicalHostName());
 		fHandle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 
+		fFormToolkit.createLabel(loginBody, "Point to Point", SWT.NONE);
+
+		btnPointToPoint = fFormToolkit.createButton(loginBody, "", SWT.CHECK);
+		btnPointToPoint.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (btnPointToPoint.getSelection()) {
+					setEnabled(false);
+				} else {
+					setEnabled(true);
+				}
+			}
+		});
+		btnPointToPoint.setSelection(true);
+		new Label(loginBody, SWT.NONE);
+
+		lblServer = fFormToolkit.createLabel(loginBody, "I Act as Server", SWT.NONE);
+		btnServer = fFormToolkit.createButton(loginBody, "", SWT.CHECK);
+		new Label(loginBody, SWT.NONE);
 		new Label(loginBody, SWT.NONE);
 		new Label(loginBody, SWT.NONE);
 
@@ -106,7 +116,7 @@ public class ChatPart {
 		btnLogin.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				startZookeeper();
+				doLogin();
 				stackLayout.topControl = fmessageForm;
 				fStackComposite.layout();
 			}
@@ -138,7 +148,7 @@ public class ChatPart {
 		fParticipants = fFormToolkit.createText(sashForm, "", SWT.READ_ONLY | SWT.MULTI);
 		fParticipants.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE));
 		fParticipants.setFont(SWTResourceManager.getFont("Courier", 9, SWT.BOLD));
-		sashForm.setWeights(new int[] {4, 1});
+		sashForm.setWeights(new int[] { 4, 1 });
 
 		fMessage = new Text(fmessageForm.getBody(), SWT.BORDER);
 		fMessage.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
@@ -148,7 +158,7 @@ public class ChatPart {
 		btnSend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				publish(fMessage.getText(), fHandle.getText());
+				fTracker.publish(fMessage.getText(), fHandle.getText());
 				fMessage.setText("");
 				fMessage.setFocus();
 			}
@@ -156,115 +166,35 @@ public class ChatPart {
 		btnSend.getShell().setDefaultButton(btnSend);
 
 		stackLayout.topControl = loginForm;
+		setEnabled(false);
+	}
 
+	private void doLogin() {
+		startZookeeper();
 		setupTracker();
 	}
 
+	protected void setEnabled(boolean enabled) {
+		lblServer.setEnabled(enabled);
+		lblServer.setEnabled(enabled);
+	}
+
 	private void setupTracker() {
-
-		try {
-			FrameworkUtil.getBundle(getClass()).getBundleContext().addServiceListener(
-					new ServiceListener() {
-
-						@Override
-						public void serviceChanged(ServiceEvent event) {
-							final ServiceReference<?> reference = event.getServiceReference();
-							final Object service = FrameworkUtil.getBundle(getClass()).getBundleContext()
-									.getService(reference);
-							if (event.getType() == ServiceEvent.REGISTERED) {
-								System.out.println("Registered: " + service.getClass().getSimpleName());
-								if (service instanceof IChatMessage) {
-									final IChatMessage chatMessage = (IChatMessage) service;
-									if (!chatMessage.getMessage().equals(fLastMessage)) {
-										fLastMessage = ((IChatMessage) service).getMessage();
-										Display.getDefault().asyncExec(new Runnable() {
-											@Override
-											public void run() {
-												boolean isLocal = (reference.getProperty("endpoint.id") == null);
-												messageComposite.addItem(new ChatElement(fLastMessage, chatMessage
-														.getHandle(), new Date(), isLocal));
-												processParticipantsList(reference, chatMessage.getHandle());
-											}
-										});
-									}
-								}
-							}
-							if (event.getType() == ServiceEvent.UNREGISTERING) {
-								System.out.println("UnRegistered: " + service.getClass().getSimpleName());
-								final ServiceReference<?> ref = event.getServiceReference();
-								Display.getDefault().asyncExec(new Runnable() {
-									@Override
-									public void run() {
-										removeFromParticipantList(ref);
-									}
-
-								});
-							}
-						}
-					},
-					"(&(" + Constants.OBJECTCLASS + "=" + IChatMessage.class.getName()
-							+ ") (| (service.exported.interfaces=*) (endpoint.id=*) ) )");
-		} catch (InvalidSyntaxException dosNotHappen) {
-			dosNotHappen.printStackTrace();
+		fTracker = new ChatTracker();
+		fTracker.setup(this, !btnPointToPoint.getSelection());
+		if (btnServer.getSelection()) {
+			fTracker.createServer();
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected void publish(String message, String handle) {
-
-		// get rid of the previous message
-		disposeServiceRegistration();
-
-		// Setup properties for remote service distribution, as per OSGi 4.2
-		// remote services
-		// specification (chap 13 in compendium spec)
-		Properties props = new Properties();
-		// add OSGi service property indicated export of all interfaces exposed
-		// by service (wildcard)
-		props.put("service.exported.interfaces", "*");
-		// add OSGi service property specifying config
-		props.put("service.exported.configs", "ecf.r_osgi.peer");
-		// register remote service
-		serviceRegistration = FrameworkUtil.getBundle(getClass()).getBundleContext()
-				.registerService(IChatMessage.class.getName(), new ChatMessage(message, handle), (Dictionary) props);
-	}
-
-	private void disposeServiceRegistration() {
-		if (serviceRegistration != null) {
-			serviceRegistration.unregister();
-			serviceRegistration = null;
+	private synchronized void processParticipantsList() {
+		String[] participants = fTracker.getSortedParticipants();
+		StringBuilder result = new StringBuilder();
+		for (String user : participants) {
+			result.append(user).append("\r\n");
 		}
-	}
-
-	private synchronized void processParticipantsList(Object key, String participant) {
-		if (!fParticipantsList.containsKey(key)) {
-			fParticipantsList.put(key, participant);
-			String[] participants = new String[fParticipantsList.size()];
-			fParticipantsList.values().toArray(participants);
-			Arrays.sort(participants);
-			StringBuilder result = new StringBuilder();
-			for (String user : participants) {
-				result.append(user).append("\r\n");
-			}
+		if (!fParticipants.isDisposed())
 			fParticipants.setText(result.toString());
-		}
-	}
-
-	private synchronized void removeFromParticipantList(Object key) {
-		if (fParticipants.isDisposed()) {
-			return;
-		}
-		if (fParticipantsList.containsKey(key)) {
-			fParticipantsList.remove(key);
-			String[] participants = new String[fParticipantsList.size()];
-			fParticipantsList.values().toArray(participants);
-			Arrays.sort(participants);
-			StringBuilder result = new StringBuilder();
-			for (String user : participants) {
-				result.append(user).append("\r\n");
-			}
-			fParticipants.setText(result.toString());
-		}
 	}
 
 	@PreDestroy
@@ -272,7 +202,7 @@ public class ChatPart {
 		if (fFormToolkit != null) {
 			fFormToolkit.dispose();
 		}
-		disposeServiceRegistration();
+		fTracker.dispose();
 	}
 
 	@Focus
@@ -294,5 +224,40 @@ public class ChatPart {
 		} catch (Exception doesNotHappen) {
 			doesNotHappen.printStackTrace();
 		}
+	}
+
+	@Override
+	public synchronized void messageRecevied(final IChatMessage message) {
+		if (!message.getMessage().equals(fLastMessage)) {
+			fLastMessage = message.getMessage();
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					boolean isLocal = fHandle.getText().equals(message.getHandle());
+					messageComposite.addItem(new ChatElement(fLastMessage, message.getHandle(), new Date(), isLocal));
+				}
+			});
+		}
+
+	}
+
+	@Override
+	public synchronized void joined(String handle) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				processParticipantsList();
+			}
+		});
+	}
+
+	@Override
+	public synchronized void left(String handle) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				processParticipantsList();
+			}
+		});
 	}
 }

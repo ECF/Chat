@@ -58,6 +58,11 @@
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/releases/kepler</url>
 		</repository>
+		<repository>
+			<id>Nebula</id>
+			<layout>p2</layout>
+			<url> http://download.eclipse.org/technology/nebula/snapshot</url>
+		</repository>
 	</repositories>
 
 </project>

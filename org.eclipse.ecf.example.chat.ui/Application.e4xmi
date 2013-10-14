@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmi:id="_s7M_kDAsEeO-EucSHMJFXw" elementId="org.eclipse.e4.ide.application" bindingContexts="_s7M_mTAsEeO-EucSHMJFXw">
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_s7M_kTAsEeO-EucSHMJFXw" label="ECF Remote Services Chat" width="500" height="400">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_s7M_kTAsEeO-EucSHMJFXw" label="ECF Remote Services Chat" width="800" height="300">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_s7NmtDAsEeO-EucSHMJFXw">
       <children xsi:type="advanced:Perspective" xmi:id="_s7NmtTAsEeO-EucSHMJFXw">
         <children xsi:type="basic:Part" xmi:id="_gtTQsDEbEeO1IdK9rVG5yA" elementId="org.eclipse.ecf.example.chat.ui.part.0" contributionURI="bundleclass://org.eclipse.ecf.example.chat.ui/org.eclipse.ecf.example.chat.ui.parts.ChatPart" closeable="true">

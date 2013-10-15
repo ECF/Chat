@@ -18,11 +18,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.eclipse.e4.ui.di.Focus;
-import org.eclipse.ecf.core.ContainerFactory;
-import org.eclipse.ecf.core.IContainer;
 import org.eclipse.ecf.example.chat.model.IChatListener;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
-import org.eclipse.ecf.provider.zookeeper.core.ZooDiscoveryContainerInstantiator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
@@ -170,7 +167,6 @@ public class ChatPart implements IChatListener {
 	}
 
 	private void doLogin() {
-		startZookeeper();
 		setupTracker();
 	}
 
@@ -181,6 +177,7 @@ public class ChatPart implements IChatListener {
 
 	private void setupTracker() {
 		fTracker = new ChatTracker();
+		fTracker.startZookeeperDiscovery(fServer.getText());
 		fTracker.setup(this, !btnPointToPoint.getSelection());
 		if (btnServer.getSelection()) {
 			fTracker.createServer();
@@ -210,21 +207,7 @@ public class ChatPart implements IChatListener {
 		fMessage.setFocus();
 	}
 
-	// FIXME Discovery providers should get configured via OSGi Config Admin
-	protected void startZookeeper() {
-		try {
-			final IContainer singleton = ContainerFactory.getDefault().createContainer(
-					ZooDiscoveryContainerInstantiator.NAME);
-			if (singleton.getConnectedID() != null) {
-				singleton.disconnect();
-			}
-			singleton.connect(
-					singleton.getConnectNamespace().createInstance(
-							new String[] { "zoodiscovery.flavor.centralized=" + fServer.getText() }), null);
-		} catch (Exception doesNotHappen) {
-			doesNotHappen.printStackTrace();
-		}
-	}
+
 
 	@Override
 	public synchronized void messageRecevied(final IChatMessage message) {

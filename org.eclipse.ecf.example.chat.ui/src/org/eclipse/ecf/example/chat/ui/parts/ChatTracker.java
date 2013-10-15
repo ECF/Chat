@@ -7,9 +7,12 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Properties;
 
+import org.eclipse.ecf.core.ContainerFactory;
+import org.eclipse.ecf.core.IContainer;
 import org.eclipse.ecf.example.chat.model.IChatListener;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.example.chat.model.IChatServer;
+import org.eclipse.ecf.provider.zookeeper.core.ZooDiscoveryContainerInstantiator;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
@@ -157,5 +160,21 @@ public class ChatTracker implements ServiceListener {
 		// register remote service
 		serviceRegistration = FrameworkUtil.getBundle(getClass()).getBundleContext()
 				.registerService(IChatServer.class.getName(), new ChatServer(), (Dictionary) props);
+	}
+
+	// FIXME Discovery providers should get configured via OSGi Config Admin
+	public void startZookeeperDiscovery(String server) {
+		try {
+			final IContainer singleton = ContainerFactory.getDefault().createContainer(
+					ZooDiscoveryContainerInstantiator.NAME);
+			if (singleton.getConnectedID() != null) {
+				singleton.disconnect();
+			}
+			singleton.connect(
+					singleton.getConnectNamespace().createInstance(
+							new String[] { "zoodiscovery.flavor.centralized=" + server }), null);
+		} catch (Exception doesNotHappen) {
+			doesNotHappen.printStackTrace();
+		}
 	}
 }

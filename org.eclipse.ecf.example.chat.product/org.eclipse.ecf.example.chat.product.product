@@ -7,8 +7,14 @@
    </configIni>
 
    <launcherArgs>
-      <programArgs>-clearPersistedState</programArgs>
-      <vmArgs>-DOFFlog4j.configuration=file:/C:\Users\jongw\git\ChatClient\org.eclipse.ecf.example.chat.feature\log4j.properties</vmArgs>
+      <programArgs>-clearPersistedState
+-console
+-consolelog
+-Dzoodiscovery.clientPort=2181
+-Dzoodiscovery.consoleLog 
+-Dosgi.console.enable.builtin=true
+-Dlog4j.debug=true
+-Dlog4j.configuration=file:log4j.properties</programArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 

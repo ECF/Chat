@@ -54,7 +54,7 @@ public class ChatBotActivator implements BundleActivator {
 	@Override
 	public void start(final BundleContext context) throws Exception {
 		
-		startZooKeeper();
+		// startZooKeeper();
 
 		final String hostName = InetAddress.getLocalHost()
 				.getCanonicalHostName();

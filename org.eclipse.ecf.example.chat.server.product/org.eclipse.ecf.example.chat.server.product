@@ -43,6 +43,12 @@
       <feature id="org.eclipse.ecf.core.feature"/>
       <feature id="org.eclipse.ecf.example.chat.server.feature"/>
       <feature id="org.eclipse.ecf.discovery.zookeeper.feature"/>
+      <feature id="org.eclipse.ecf.example.chat.feature"/>
+      <feature id="org.eclipse.ecf.remoteservice.feature"/>
+      <feature id="org.eclipse.ecf.remoteservice.rosgi.feature"/>
+      <feature id="org.eclipse.ecf.discovery.feature"/>
+      <feature id="org.eclipse.ecf.server.generic.feature"/>
+      <feature id="org.eclipse.ecf.osgi.services.feature"/>
    </features>
 
    <configurations>
@@ -54,7 +60,6 @@
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.equinox.simpleconfigurator.manipulator" autoStart="true" startLevel="0" />
-      <plugin id="org.eclipse.osgi.services" autoStart="true" startLevel="0" />
    </configurations>
 
 </product>

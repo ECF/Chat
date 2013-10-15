@@ -19,6 +19,8 @@
 		<module>../org.eclipse.ecf.example.chat.product</module>
 		<module>../org.eclipse.ecf.example.chat.bot</module>
 		<module>../org.eclipse.ecf.example.chat.ui</module>
+		<module>../org.eclipse.ecf.example.chat.server.feature</module>
+		<module>../org.eclipse.ecf.example.chat.server.product</module>
 	</modules>
 
 

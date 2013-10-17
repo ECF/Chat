@@ -1,6 +1,6 @@
 package org.eclipse.ecf.example.chat.model;
 
-public interface IChatListener {
+public interface IPointToPointChatListener {
 
 	void messageRecevied(IChatMessage message);
 

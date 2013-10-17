@@ -43,7 +43,6 @@
       <feature id="org.eclipse.ecf.core.feature"/>
       <feature id="org.eclipse.ecf.example.chat.server.feature"/>
       <feature id="org.eclipse.ecf.discovery.zookeeper.feature"/>
-      <feature id="org.eclipse.ecf.example.chat.feature"/>
       <feature id="org.eclipse.ecf.remoteservice.feature"/>
       <feature id="org.eclipse.ecf.remoteservice.rosgi.feature"/>
       <feature id="org.eclipse.ecf.discovery.feature"/>

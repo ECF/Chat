@@ -18,8 +18,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.eclipse.e4.ui.di.Focus;
-import org.eclipse.ecf.example.chat.model.IChatListener;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
+import org.eclipse.ecf.example.chat.model.IPointToPointChatListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
@@ -31,14 +31,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-public class ChatPart implements IChatListener {
+public class ChatPart implements IPointToPointChatListener {
 	private Text fMessage;
 	private String fLastMessage;
 	private Composite fStackComposite;
@@ -49,9 +48,7 @@ public class ChatPart implements IChatListener {
 	private Text fParticipants;
 	private SashForm sashForm;
 	private MessageComposite messageComposite;
-	private Button btnPointToPoint;
-	private Button btnServer;
-	private Label lblServer;
+	private Button btnServerMode;
 	private ChatTracker fTracker;
 
 	@PostConstruct
@@ -87,27 +84,9 @@ public class ChatPart implements IChatListener {
 				+ InetAddress.getLocalHost().getCanonicalHostName());
 		fHandle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 
-		fFormToolkit.createLabel(loginBody, "Point to Point", SWT.NONE);
+		fFormToolkit.createLabel(loginBody, "Server Mode", SWT.NONE);
 
-		btnPointToPoint = fFormToolkit.createButton(loginBody, "", SWT.CHECK);
-		btnPointToPoint.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (btnPointToPoint.getSelection()) {
-					setEnabled(false);
-				} else {
-					setEnabled(true);
-				}
-			}
-		});
-		btnPointToPoint.setSelection(true);
-		new Label(loginBody, SWT.NONE);
-
-		lblServer = fFormToolkit.createLabel(loginBody, "I Act as Server", SWT.NONE);
-		btnServer = fFormToolkit.createButton(loginBody, "", SWT.CHECK);
-		new Label(loginBody, SWT.NONE);
-		new Label(loginBody, SWT.NONE);
-		new Label(loginBody, SWT.NONE);
+		btnServerMode = fFormToolkit.createButton(loginBody, "", SWT.CHECK);
 
 		Button btnLogin = fFormToolkit.createButton(loginBody, "Login", SWT.NONE);
 		btnLogin.addSelectionListener(new SelectionAdapter() {
@@ -155,7 +134,7 @@ public class ChatPart implements IChatListener {
 		btnSend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				fTracker.publish(fMessage.getText(), fHandle.getText());
+				fTracker.publish(fMessage.getText());
 				fMessage.setText("");
 				fMessage.setFocus();
 			}
@@ -163,25 +142,17 @@ public class ChatPart implements IChatListener {
 		btnSend.getShell().setDefaultButton(btnSend);
 
 		stackLayout.topControl = loginForm;
-		setEnabled(false);
 	}
 
 	private void doLogin() {
 		setupTracker();
 	}
 
-	protected void setEnabled(boolean enabled) {
-		lblServer.setEnabled(enabled);
-		lblServer.setEnabled(enabled);
-	}
-
 	private void setupTracker() {
 		fTracker = new ChatTracker();
 		fTracker.startZookeeperDiscovery(fServer.getText());
-		fTracker.setup(this, !btnPointToPoint.getSelection());
-		if (btnServer.getSelection()) {
-			fTracker.createServer();
-		}
+		fTracker.setup(this, btnServerMode.getSelection(), fHandle.getText());
+		fHandle.getShell().setText(fHandle.getShell().getText() + ": " + fHandle.getText());
 	}
 
 	private synchronized void processParticipantsList() {
@@ -206,8 +177,6 @@ public class ChatPart implements IChatListener {
 	public void setFocus() {
 		fMessage.setFocus();
 	}
-
-
 
 	@Override
 	public synchronized void messageRecevied(final IChatMessage message) {

@@ -9,9 +9,11 @@ import java.util.Properties;
 
 import org.eclipse.ecf.core.ContainerFactory;
 import org.eclipse.ecf.core.IContainer;
-import org.eclipse.ecf.example.chat.model.IChatListener;
+import org.eclipse.ecf.example.chat.model.ChatMessage;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.example.chat.model.IChatServer;
+import org.eclipse.ecf.example.chat.model.IChatServerListener;
+import org.eclipse.ecf.example.chat.model.IPointToPointChatListener;
 import org.eclipse.ecf.provider.zookeeper.core.ZooDiscoveryContainerInstantiator;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Constants;
@@ -22,13 +24,14 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
-public class ChatTracker implements ServiceListener {
+public class ChatTracker implements ServiceListener, IChatServerListener {
 
-	private IChatListener fCallBack;
+	private IPointToPointChatListener fCallBack;
 	private Hashtable<Object, String> fParticipants = new Hashtable<Object, String>();
 	private ServiceRegistration<?> serviceRegistration;
 	private boolean fServerMode;
-	private ArrayList<IChatServer> fChatServers = new ArrayList<IChatServer>();
+	private IChatServer fServer;
+	private String fHandle;
 
 	@Override
 	public void serviceChanged(ServiceEvent event) {
@@ -36,19 +39,18 @@ public class ChatTracker implements ServiceListener {
 		final ServiceReference<?> reference = event.getServiceReference();
 		final Object service = FrameworkUtil.getBundle(getClass()).getBundleContext().getService(reference);
 		if (event.getType() == ServiceEvent.REGISTERED) {
-			System.out.println("Registered: " + service.getClass().getSimpleName());
+			System.out.print("Registered: " + service.getClass().getSimpleName());
 			if (service instanceof IChatMessage) {
 				final IChatMessage chatMessage = (IChatMessage) service;
+				System.out.println(" (" + chatMessage.getClass().getSimpleName()+")");
 				fParticipants.put(reference, chatMessage.getHandle());
 				fCallBack.messageRecevied(chatMessage);
 				fCallBack.joined(chatMessage.getHandle());
 			}
 			if (service instanceof IChatServer) {
-				IChatServer server = (IChatServer) service;
-				server.addListener(fCallBack);
-				if (!fChatServers.contains(server)) {
-					fChatServers.add(server);
-				}
+				fServer = (IChatServer) service;
+				System.out.println(" (" + fServer.getClass().getSimpleName()+")");
+				createServerListener();
 			}
 		}
 		if (event.getType() == ServiceEvent.UNREGISTERING) {
@@ -66,7 +68,7 @@ public class ChatTracker implements ServiceListener {
 			}
 
 			if (service instanceof IChatServer) {
-				fChatServers = null;
+				fServer = null;
 			}
 		}
 	}
@@ -76,12 +78,13 @@ public class ChatTracker implements ServiceListener {
 		FrameworkUtil.getBundle(getClass()).getBundleContext().removeServiceListener(this);
 	}
 
-	public void setup(IChatListener callBack, boolean serverMode) {
+	public void setup(IPointToPointChatListener callBack, boolean serverMode, String handle) {
 		this.fCallBack = callBack;
 		this.fServerMode = serverMode;
-		String filterString = getFilterString(serverMode);
+		this.fHandle = handle;
 		try {
-			FrameworkUtil.getBundle(getClass()).getBundleContext().addServiceListener(this, filterString);
+			FrameworkUtil.getBundle(getClass()).getBundleContext()
+					.addServiceListener(this, getFilterString(serverMode));
 		} catch (InvalidSyntaxException doesNotHappen) {
 			doesNotHappen.printStackTrace();
 		}
@@ -110,25 +113,25 @@ public class ChatTracker implements ServiceListener {
 		return result;
 	}
 
-	public void publish(String message, String handle) {
-		ChatMessage chatMessage = new ChatMessage(message, handle);
+	public void publish(String message) {
+		IChatMessage chatMessage = new ChatMessage(message, fHandle);
 		if (fServerMode) {
-			for (IChatServer server : fChatServers) {
-				server.setMessage(chatMessage);
+			if (fServer != null) {
+				fServer.post(chatMessage);
 			}
 		} else {
 			createChatMessageService(chatMessage);
 		}
 	}
 
-	private void createChatMessageService(ChatMessage chatMessage) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void createChatMessageService(IChatMessage chatMessage) {
 		// get rid of the previous message
 		disposeServiceRegistration();
 
 		// Setup properties for remote service distribution, as per OSGi 4.2
-		// remote services
-		// specification (chap 13 in compendium spec)
-		Properties props = new Properties();
+		// remote services specification (chap 13 in compendium spec)
+		Dictionary<Object, Object> props = new Properties();
 		// add OSGi service property indicated export of all interfaces exposed
 		// by service (wildcard)
 		props.put("service.exported.interfaces", "*");
@@ -140,17 +143,13 @@ public class ChatTracker implements ServiceListener {
 
 	}
 
-	private void disposeServiceRegistration() {
-		if (serviceRegistration != null) {
-			serviceRegistration.unregister();
-			serviceRegistration = null;
-		}
-	}
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void createServerListener() {
+		// get rid of the previous message
+		disposeServiceRegistration();
 
-	public void createServer() {
 		// Setup properties for remote service distribution, as per OSGi 4.2
-		// remote services
-		// specification (chap 13 in compendium spec)
+		// remote services specification (chap 13 in compendium spec)
 		Properties props = new Properties();
 		// add OSGi service property indicated export of all interfaces exposed
 		// by service (wildcard)
@@ -159,7 +158,15 @@ public class ChatTracker implements ServiceListener {
 		props.put("service.exported.configs", "ecf.r_osgi.peer");
 		// register remote service
 		serviceRegistration = FrameworkUtil.getBundle(getClass()).getBundleContext()
-				.registerService(IChatServer.class.getName(), new ChatServer(), (Dictionary) props);
+				.registerService(IChatServerListener.class.getName(), this, (Dictionary) props);
+
+	}
+
+	private void disposeServiceRegistration() {
+		if (serviceRegistration != null) {
+			serviceRegistration.unregister();
+			serviceRegistration = null;
+		}
 	}
 
 	// FIXME Discovery providers should get configured via OSGi Config Admin
@@ -176,5 +183,20 @@ public class ChatTracker implements ServiceListener {
 		} catch (Exception doesNotHappen) {
 			doesNotHappen.printStackTrace();
 		}
+	}
+
+	@Override
+	public synchronized void messageReceived(Long time) {
+		if (fServerMode && fServer != null) {
+			IChatMessage[] messages = fServer.getMessages(time);
+			for (IChatMessage message : messages) {
+				fCallBack.messageRecevied(message);
+			}
+		}
+	}
+
+	@Override
+	public String getHandle() {
+		return fHandle;
 	}
 }

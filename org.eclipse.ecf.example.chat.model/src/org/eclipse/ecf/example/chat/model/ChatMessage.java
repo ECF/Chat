@@ -1,8 +1,11 @@
-package org.eclipse.ecf.example.chat.ui.parts;
+package org.eclipse.ecf.example.chat.model;
 
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 
 public class ChatMessage implements IChatMessage {
+	
+	public ChatMessage() {
+	}
 
 	private String message;
 	private String handle;

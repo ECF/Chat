@@ -2,20 +2,21 @@ package org.eclipse.ecf.example.chat.server.core.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.eclipse.ecf.example.chat.model.IChatServerListener;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.example.chat.model.IChatServer;
+import org.eclipse.ecf.example.chat.model.IChatServerListener;
 
 public class ChatServer implements IChatServer {
 
-	private List<IChatServerListener> fListeners = new ArrayList<IChatServerListener>();
-	private List<String> fHandles = new ArrayList<String>();
+	private Map<String, IChatServerListener> fListener = new HashMap<String, IChatServerListener>();
 	private NavigableMap<Long, IChatMessage> fMessages = new TreeMap<Long, IChatMessage>();
 
 	@Override
@@ -31,10 +32,12 @@ public class ChatServer implements IChatServer {
 	}
 
 	@Override
-	public String[] getHandles() {
-		synchronized (fHandles) {
-			return fHandles.toArray(new String[0]);
+	public synchronized String[] getHandles() {
+		Set<String> keySet;
+		synchronized (fListener) {
+			keySet = fListener.keySet();
 		}
+		return keySet.toArray(new String[0]);
 	}
 
 	@Override
@@ -47,20 +50,16 @@ public class ChatServer implements IChatServer {
 		notifyListeners(time);
 	}
 
-	private void notifyListeners(Long time) {
-		ArrayList<IChatServerListener> currentListeners = new ArrayList<IChatServerListener>();
-		synchronized (fListeners) {
-			for (IChatServerListener listener : fListeners) {
-				if (!currentListeners.contains(listener)) {
-					currentListeners.add(listener);
-				}
-				doBackGroundNotify(currentListeners, time);
-			}
+	private synchronized void notifyListeners(Long time) {
+		Collection<IChatServerListener> values;
+		synchronized (fListener) {
+			values = fListener.values();
 		}
+		doBackGroundNotify(values, time);
 	}
 
 	// TODO find a good strategy for unresponsive listeners
-	private void doBackGroundNotify(ArrayList<IChatServerListener> currentListeners, final Long time) {
+	private void doBackGroundNotify(Collection<IChatServerListener> currentListeners, final Long time) {
 		ExecutorService threadExecutor = Executors.newSingleThreadExecutor();
 		for (final IChatServerListener listener : currentListeners) {
 			Runnable runner = new Runnable() {
@@ -75,29 +74,17 @@ public class ChatServer implements IChatServer {
 
 	public void bindListener(IChatServerListener listener) {
 		System.err.println("Bound " + listener.getHandle());
-		String handle = null;
-		synchronized (fListeners) {
-			fListeners.add(listener);
-			handle = listener.getHandle();
-		}
-		synchronized (fHandles) {
-			if (!fHandles.contains(handle)) {
-				fHandles.add(handle);
-			}
+		String handle = listener.getHandle();
+		synchronized (fListener) {
+			fListener.put(handle, listener);
 		}
 	}
 
 	public void unbindListener(IChatServerListener listener) {
 		System.err.println("Bound " + listener);
-		String handle = null;
-		synchronized (fListeners) {
-			handle = listener.getHandle();
-			fListeners.remove(listener);
-		}
-		synchronized (fHandles) {
-			if (fHandles.contains(handle)) {
-				fHandles.remove(handle);
-			}
+		String handle = listener.getHandle();
+		synchronized (fListener) {
+			fListener.remove(handle);
 		}
 	}
 }

@@ -170,7 +170,11 @@ public class ChatPart implements IPointToPointChatListener {
 		if (fFormToolkit != null) {
 			fFormToolkit.dispose();
 		}
-		fTracker.dispose();
+		// If user never connects but ends the application right away, fTracker
+		// is null
+		if (fTracker != null) {
+			fTracker.dispose();
+		}
 	}
 
 	@Focus

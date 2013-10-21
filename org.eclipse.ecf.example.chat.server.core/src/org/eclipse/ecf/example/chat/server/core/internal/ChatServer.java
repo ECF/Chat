@@ -16,8 +16,8 @@ import org.eclipse.ecf.example.chat.model.IChatServerListener;
 
 public class ChatServer implements IChatServer {
 
-	private Map<String, IChatServerListener> fListener = new HashMap<String, IChatServerListener>();
-	private NavigableMap<Long, IChatMessage> fMessages = new TreeMap<Long, IChatMessage>();
+	private final Map<String, IChatServerListener> fListener = new HashMap<String, IChatServerListener>();
+	private final NavigableMap<Long, IChatMessage> fMessages = new TreeMap<Long, IChatMessage>();
 
 	@Override
 	public IChatMessage[] getMessages(Long time) {

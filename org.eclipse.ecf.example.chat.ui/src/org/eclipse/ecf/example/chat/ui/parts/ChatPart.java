@@ -20,6 +20,9 @@ import javax.annotation.PreDestroy;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.example.chat.model.IPointToPointChatListener;
+import org.eclipse.ecf.example.chat.tracker.CentralisticChatTracker;
+import org.eclipse.ecf.example.chat.tracker.ChatTracker;
+import org.eclipse.ecf.example.chat.tracker.P2PChatTracker;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
@@ -149,9 +152,13 @@ public class ChatPart implements IPointToPointChatListener {
 	}
 
 	private void setupTracker() {
-		fTracker = new ChatTracker();
+		if (btnServerMode.getSelection() == true) {
+			fTracker = new CentralisticChatTracker(this, fHandle.getText());
+		} else {
+			fTracker = new P2PChatTracker(this, fHandle.getText());
+		}
 		fTracker.startZookeeperDiscovery(fServer.getText());
-		fTracker.setup(this, btnServerMode.getSelection(), fHandle.getText());
+		fTracker.setup();
 		fHandle.getShell().setText(fHandle.getShell().getText() + ": " + fHandle.getText());
 	}
 

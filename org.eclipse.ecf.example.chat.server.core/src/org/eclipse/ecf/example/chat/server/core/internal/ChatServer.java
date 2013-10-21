@@ -18,6 +18,7 @@ public class ChatServer implements IChatServer {
 
 	private final Map<String, IChatServerListener> fListener = new HashMap<String, IChatServerListener>();
 	private final NavigableMap<Long, IChatMessage> fMessages = new TreeMap<Long, IChatMessage>();
+	private final ExecutorService threadExecutor = Executors.newSingleThreadExecutor();
 
 	@Override
 	public IChatMessage[] getMessages(Long time) {
@@ -60,7 +61,6 @@ public class ChatServer implements IChatServer {
 
 	// TODO find a good strategy for unresponsive listeners
 	private void doBackGroundNotify(Collection<IChatServerListener> currentListeners, final Long time) {
-		ExecutorService threadExecutor = Executors.newSingleThreadExecutor();
 		for (final IChatServerListener listener : currentListeners) {
 			Runnable runner = new Runnable() {
 				@Override

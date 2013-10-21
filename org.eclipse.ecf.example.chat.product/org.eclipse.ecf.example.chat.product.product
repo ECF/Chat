@@ -15,6 +15,7 @@
 -Dosgi.console.enable.builtin=true
 -Dlog4j.debug=true
 -Dlog4j.configuration=file:log4j.properties</programArgs>
+      <vmArgs>-Dch.ethz.iks.r_osgi.topic.filter=org/eclipse/e4/*</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 

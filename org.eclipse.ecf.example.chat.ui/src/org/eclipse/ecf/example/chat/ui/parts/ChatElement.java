@@ -1,6 +1,5 @@
 package org.eclipse.ecf.example.chat.ui.parts;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

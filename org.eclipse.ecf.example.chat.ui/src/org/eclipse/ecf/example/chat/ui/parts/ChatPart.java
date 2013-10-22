@@ -11,6 +11,7 @@
 package org.eclipse.ecf.example.chat.ui.parts;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -21,6 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -30,6 +32,8 @@ import org.eclipse.ecf.example.chat.model.IPointToPointChatListener;
 import org.eclipse.ecf.example.chat.tracker.CentralisticChatTracker;
 import org.eclipse.ecf.example.chat.tracker.ChatTracker;
 import org.eclipse.ecf.example.chat.tracker.P2PChatTracker;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
@@ -41,6 +45,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -67,7 +72,7 @@ public class ChatPart implements IPointToPointChatListener {
 	private UISynchronize sync;
 	
 	@PostConstruct
-	public void createComposite(final Composite parent, @Optional final ConfigurationAdmin cm, MPart part) throws UnknownHostException {
+	public void createComposite(final Composite parent, @Optional final ConfigurationAdmin cm, MPart part, final Shell shell) throws UnknownHostException {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		fStackComposite = new Composite(parent, SWT.NONE);
@@ -115,9 +120,36 @@ public class ChatPart implements IPointToPointChatListener {
 		btnLogin.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				doLogin(cm);
-				stackLayout.topControl = fmessageForm;
-				fStackComposite.layout();
+				final boolean serverMode = btnServerMode.getSelection();
+				final String handle = fHandle.getText();
+				final String discoServer = fServer.getText();
+				
+				final ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
+				try {
+					dialog.run(true, false, new IRunnableWithProgress() {
+
+						@Override
+						public void run(IProgressMonitor monitor)
+								throws InvocationTargetException,
+								InterruptedException {
+							doLogin(serverMode, handle, discoServer, cm);
+							sync.syncExec(new Runnable() {
+								@Override
+								public void run() {
+									fHandle.getShell().setText(
+											fHandle.getShell().getText() + ": "
+													+ fHandle.getText());
+									stackLayout.topControl = fmessageForm;
+									fStackComposite.layout();
+								}
+							});
+						}
+					});
+				} catch (InvocationTargetException doesNotHappen) {
+					doesNotHappen.printStackTrace();
+				} catch (InterruptedException doesNotHappen) {
+					doesNotHappen.printStackTrace();
+				}
 			}
 		});
 		btnLogin.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -167,15 +199,15 @@ public class ChatPart implements IPointToPointChatListener {
 		stackLayout.topControl = loginForm;
 	}
 
-	private void doLogin(ConfigurationAdmin cm) {
-		setupTracker(cm);
+	private void doLogin(boolean serverMode, String handle, String discoServer, ConfigurationAdmin cm) {
+		setupTracker(serverMode, handle, discoServer, cm);
 	}
 
-	private void setupTracker(ConfigurationAdmin cm) {
-		if (btnServerMode.getSelection() == true) {
-			fTracker = new CentralisticChatTracker(this, fHandle.getText());
+	private void setupTracker(boolean serverMode, String handle, String discoServer, ConfigurationAdmin cm) {
+		if (serverMode == true) {
+			fTracker = new CentralisticChatTracker(this, handle);
 		} else {
-			fTracker = new P2PChatTracker(this, fHandle.getText());
+			fTracker = new P2PChatTracker(this, handle);
 		}
 		
 		if (cm != null) {
@@ -185,7 +217,7 @@ public class ChatPart implements IPointToPointChatListener {
 				if (properties == null) {
 					properties = new Hashtable<String, Object>();
 				}
-				properties.put("SERVER", fServer.getText());
+				properties.put("SERVER", discoServer);
 				configuration.update(properties);
 			} catch (IOException doesNotHappen) {
 				doesNotHappen.printStackTrace();
@@ -193,7 +225,6 @@ public class ChatPart implements IPointToPointChatListener {
 		}
 		
 		fTracker.setup();
-		fHandle.getShell().setText(fHandle.getShell().getText() + ": " + fHandle.getText());
 	}
 
 	private synchronized void processParticipantsList() {

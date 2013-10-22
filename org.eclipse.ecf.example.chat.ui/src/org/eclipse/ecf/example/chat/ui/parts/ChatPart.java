@@ -250,7 +250,9 @@ public class ChatPart implements IPointToPointChatListener {
 			@Override
 			public void run() {
 				processParticipantsList();
-				messageComposite.addItem(new ChatElement(handle, new Date(), ChatElement.State.LEFT));
+				if(!messageComposite.isDisposed()) {
+					messageComposite.addItem(new ChatElement(handle, new Date(), ChatElement.State.LEFT));
+				}
 			}
 		});
 	}

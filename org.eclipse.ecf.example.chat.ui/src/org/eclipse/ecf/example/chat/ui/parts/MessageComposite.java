@@ -28,7 +28,9 @@ import org.eclipse.swt.widgets.Shell;
 
 public class MessageComposite extends Composite {
 	private Color fGray;
-
+	private Color fGreen;	
+	private Color fRed;
+	
 	private static class ContentProvider implements ITreeContentProvider {
 		private Object newInput;
 
@@ -89,6 +91,10 @@ public class MessageComposite extends Composite {
 			ChatElement chatElement = (ChatElement) element;
 			if (chatElement.isLocal()) {
 				return fGray;
+			} else if (chatElement.hasJoined()) {
+				return fGreen;
+			} else if (chatElement.hasLeft()) {
+				return fRed;
 			}
 			return null;
 		}
@@ -143,6 +149,8 @@ public class MessageComposite extends Composite {
 		setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		fGray = Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
+		fGreen = Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN);
+		fRed = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
 
 		fViewer = new GridTreeViewer(this, SWT.BORDER | SWT.V_SCROLL);
 		final Grid grid = fViewer.getGrid();

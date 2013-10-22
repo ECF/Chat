@@ -1,5 +1,9 @@
 package org.eclipse.ecf.example.chat.tracker;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.eclipse.ecf.example.chat.model.ChatMessage;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.example.chat.model.IChatServer;
@@ -99,12 +103,21 @@ public class CentralisticChatTracker extends ChatTracker implements IChatServerL
 	@Override
 	public void handleReceived(Long time) {
 		String[] handles = fServer.getHandles();
-		fParticipants.clear();
+		
+		// Find out if handles have disappeared and notify UI
+		final Collection<String> removed = new ArrayList<String>(fParticipants.values());
+		removed.removeAll(Arrays.asList(handles));
+		for (String handle : removed) {
+			fParticipants.remove(handle);
+			fCallBack.left(handle);	
+		}
+		
+		// add current set of participants
 		for (String handle : handles) {
-			fParticipants.put(handle, handle);
-			// TODO Distinguish between join/lefts which is currently
-			// handled by the UI layer (re-creates list in both cases)
-			fCallBack.joined(handle);
+			if (!fParticipants.contains(handle)) {
+				fParticipants.put(handle, handle);
+				fCallBack.joined(handle);
+			}
 		}
 	}
 }

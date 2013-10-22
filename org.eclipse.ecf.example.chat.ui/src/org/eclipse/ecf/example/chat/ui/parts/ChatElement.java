@@ -5,18 +5,44 @@ import java.util.Date;
 
 public class ChatElement {
 
+	public enum State {
+		MESSAGE(""),
+		JOINED("joined"),
+		LEFT("left");
+		
+		private String s;
+
+		private State(String s) {
+			this.s = s;
+		}
+		
+		public String getS() {
+			return s;
+		}
+	}
+	
 	private final String message;
 	private final Date date;
 	private final boolean isLocal;
 	private final String handle;
-	private SimpleDateFormat formatter;
+	private State state;
+	
+	private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
 	public ChatElement(String message, String handle, Date date, boolean isLocal) {
 		this.message = message;
 		this.handle = handle;
 		this.date = date;
 		this.isLocal = isLocal;
-		this.formatter = new SimpleDateFormat("HH:mm:ss");
+		this.state = State.MESSAGE;
+	}
+
+	public ChatElement(String handle, Date date, State state) {
+		this.message = "has " + state.s + " the building";
+		this.handle = handle;
+		this.date = date;
+		this.isLocal = false;
+		this.state = state;
 	}
 
 	/**
@@ -54,4 +80,12 @@ public class ChatElement {
 		return isLocal;
 	}
 
+	
+	public boolean hasLeft() {
+		return this.state == State.LEFT;
+	}
+	
+	public boolean hasJoined() {
+		return this.state == State.JOINED;
+	}
 }

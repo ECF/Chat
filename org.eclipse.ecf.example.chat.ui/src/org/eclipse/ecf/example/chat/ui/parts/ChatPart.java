@@ -205,21 +205,23 @@ public class ChatPart implements IPointToPointChatListener {
 	}
 
 	@Override
-	public synchronized void joined(String handle) {
+	public synchronized void joined(final String handle) {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				processParticipantsList();
+				messageComposite.addItem(new ChatElement(handle, new Date(), ChatElement.State.JOINED));
 			}
 		});
 	}
 
 	@Override
-	public synchronized void left(String handle) {
+	public synchronized void left(final String handle) {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				processParticipantsList();
+				messageComposite.addItem(new ChatElement(handle, new Date(), ChatElement.State.LEFT));
 			}
 		});
 	}

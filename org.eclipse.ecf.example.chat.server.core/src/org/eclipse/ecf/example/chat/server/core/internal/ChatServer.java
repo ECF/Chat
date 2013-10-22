@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -67,43 +63,21 @@ public class ChatServer implements IChatServer {
 
 	@Override
 	public synchronized String[] getHandles() {
-		// 1. Lookup all currently known listeners
 		final Set<IChatServerListener> listeners = getChatListeners();
-		
-		// 2. Ask each known listener what its handle is (in parallel if supported by threadExecutor)
-		final CompletionService<String> ecs = new ExecutorCompletionService<String>(threadExecutor);
+		final List<String> res = new ArrayList<String>(listeners.size());
 		for (final IChatServerListener listener : listeners) {
-			ecs.submit(new Callable<String>() {
-				@Override
-				public String call() throws Exception {
-					// It's a service and thus might fail
-					try {
-						return listener.getHandle();
-					} catch (Exception e) {
-						e.printStackTrace();
-						return null;
-					}
-				}
-			});
-		}
-
-		// 3. Convert results to a simple String[]
-		final List<String> res = new ArrayList<String>();
-		for (int i = 0; i < listeners.size(); i++) {
+			// It's a service and thus might fail
 			try {
-				String string = ecs.take().get();
-				if (string != null) {
-					res.add(string);
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
+				String handle = listener.getHandle();
+				res.add(handle);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+
 		return res.toArray(new String[res.size()]);
 	}
-
+	
 	@Override
 	public void post(IChatMessage message) {
 		System.err.println("message:" + message.getMessage());

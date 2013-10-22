@@ -10,11 +10,13 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 public class NewChat {
 
 	private static final String PART_STACK_ID = "org.eclipse.ecf.example.chat.ui.partstack.0";
+	private static int CNT = 2;
 
 	@Execute
 	public void execute(MApplication app, EModelService ems, EPartService eps) {
 		MPart newPart = ems.createModelElement(MPart.class);
-		newPart.setLabel("OSGi chat #2");
+		newPart.setElementId(getClass().getName() + CNT);
+		newPart.setLabel("OSGi chat #" + CNT++);
 		newPart.setContributionURI("bundleclass://org.eclipse.ecf.example.chat.ui/org.eclipse.ecf.example.chat.ui.parts.ChatPart");
 		newPart.setCloseable(true);
 		

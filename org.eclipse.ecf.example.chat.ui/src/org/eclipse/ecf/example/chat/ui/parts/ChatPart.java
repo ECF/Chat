@@ -22,6 +22,7 @@ import javax.annotation.PreDestroy;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.example.chat.model.IPointToPointChatListener;
 import org.eclipse.ecf.example.chat.tracker.CentralisticChatTracker;
@@ -61,7 +62,7 @@ public class ChatPart implements IPointToPointChatListener {
 	private ChatTracker fTracker;
 
 	@PostConstruct
-	public void createComposite(final Composite parent, @Optional final ConfigurationAdmin cm) throws UnknownHostException {
+	public void createComposite(final Composite parent, @Optional final ConfigurationAdmin cm, MPart part) throws UnknownHostException {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		fStackComposite = new Composite(parent, SWT.NONE);
@@ -93,8 +94,12 @@ public class ChatPart implements IPointToPointChatListener {
 		fFormToolkit.createLabel(loginBody, "Handle", SWT.NONE);
 
 		fHandle = fFormToolkit.createText(loginBody, "", SWT.NONE);
-		fHandle.setText(System.getProperty("user.name", "nobody") + "@"
-				+ InetAddress.getLocalHost().getCanonicalHostName());
+		if (part.getElementId().equals("org.eclipse.ecf.example.chat.ui.part.0")) {
+			fHandle.setText(System.getProperty("user.name", "nobody") + "@"
+					+ InetAddress.getLocalHost().getCanonicalHostName());
+		} else {
+			fHandle.setText(part.getLabel());
+		}
 		fHandle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 
 		fFormToolkit.createLabel(loginBody, "Centralistic Mode", SWT.NONE);

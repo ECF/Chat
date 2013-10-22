@@ -16,6 +16,7 @@ public class NewChat {
 		MPart newPart = ems.createModelElement(MPart.class);
 		newPart.setLabel("OSGi chat #2");
 		newPart.setContributionURI("bundleclass://org.eclipse.ecf.example.chat.ui/org.eclipse.ecf.example.chat.ui.parts.ChatPart");
+		newPart.setCloseable(true);
 		
 		MPartStack stack = (MPartStack) ems.find(PART_STACK_ID, app);
 		stack.getChildren().add(newPart);

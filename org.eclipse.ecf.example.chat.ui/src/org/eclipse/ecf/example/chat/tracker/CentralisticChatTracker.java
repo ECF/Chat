@@ -66,15 +66,15 @@ public class CentralisticChatTracker extends ChatTracker implements IChatServerL
 		final ServiceReference<?> reference = event.getServiceReference();
 		final Object service = FrameworkUtil.getBundle(getClass()).getBundleContext().getService(reference);
 		if (event.getType() == ServiceEvent.REGISTERED) {
-			System.out.print("Registered: " + service.getClass().getSimpleName());
 			if (service instanceof IChatServer) {
+				System.out.print("Registered IChatServer: " + service.getClass().getSimpleName());
 				fServer = (IChatServer) service;
 				System.out.println(" (" + fServer.getClass().getSimpleName()+")");
 				createService(IChatServerListener.class, this);
 			}
 		} else if (event.getType() == ServiceEvent.UNREGISTERING) {
-			System.out.println("UnRegistered: " + service.getClass().getSimpleName());
 			if (service instanceof IChatServer) {
+				System.out.println("UnRegistered IChatServer: " + service.getClass().getSimpleName());
 				fServer = null;
 			}
 		}

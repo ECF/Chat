@@ -97,6 +97,7 @@ public class CentralisticChatTracker extends ChatTracker implements IChatServerL
 	@Override
 	public void handleReceived(Long time) {
 		String[] handles = fServer.getHandles();
+		fParticipants.clear();
 		for (String handle : handles) {
 			fParticipants.put(handle, handle);
 			// TODO Distinguish between join/lefts which is currently

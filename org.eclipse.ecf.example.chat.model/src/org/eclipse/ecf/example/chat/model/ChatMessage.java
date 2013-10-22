@@ -2,6 +2,7 @@ package org.eclipse.ecf.example.chat.model;
 
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 
+@SuppressWarnings("serial")
 public class ChatMessage implements IChatMessage {
 	
 	public ChatMessage() {

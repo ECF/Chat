@@ -30,15 +30,11 @@ public abstract class ChatTracker implements ServiceListener {
 		FrameworkUtil.getBundle(getClass()).getBundleContext().removeServiceListener(this);
 	}
 
-	public void setup(String discoServer) {
+	public void setup() {
 		try {
 			BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
 			bundleContext
 					.addServiceListener(this, getFilterString());
-			
-			Dictionary props = new Properties();
-			props.put("ZooDiscoveryConfig", "foobar");
-			bundleContext.registerService(String.class, discoServer, (Dictionary<String, Object>) props);
 		} catch (InvalidSyntaxException doesNotHappen) {
 			doesNotHappen.printStackTrace();
 		}

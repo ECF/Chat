@@ -33,8 +33,8 @@ public class CentralisticChatTracker extends ChatTracker implements IChatServerL
 	}
 
 	@Override
-	public void setup(String hostname) {
-		super.setup(hostname);
+	public void setup() {
+		super.setup();
 		
 		// Get the initial reference if there happens to be a running server
 		final BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();

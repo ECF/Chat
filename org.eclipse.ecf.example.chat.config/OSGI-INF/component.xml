@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.ecf.example.chat.config">
    <implementation class="org.eclipse.ecf.example.chat.config.ZooDiscoveryExtender"/>
-   <reference bind="setHostname" cardinality="1..1" interface="java.lang.String" name="String" policy="static"/>
+   <property name="service.pid" type="String" value="org.eclipse.ecf.example.chat.config"/>
+   <service>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
+   </service>
 </scr:component>

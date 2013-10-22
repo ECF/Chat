@@ -10,13 +10,17 @@
  *******************************************************************************/
 package org.eclipse.ecf.example.chat.ui.parts;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.example.chat.model.IPointToPointChatListener;
@@ -39,6 +43,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 public class ChatPart implements IPointToPointChatListener {
 	private Text fMessage;
@@ -55,7 +61,7 @@ public class ChatPart implements IPointToPointChatListener {
 	private ChatTracker fTracker;
 
 	@PostConstruct
-	public void createComposite(final Composite parent) throws UnknownHostException {
+	public void createComposite(final Composite parent, @Optional final ConfigurationAdmin cm) throws UnknownHostException {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		fStackComposite = new Composite(parent, SWT.NONE);
@@ -79,6 +85,10 @@ public class ChatPart implements IPointToPointChatListener {
 		fServer.setText("disco.ecf-project.org");
 		fServer.selectAll();
 		fServer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		if (cm == null) {
+			 fServer.setEnabled(false);
+			 fServer.setText("No discovery and/or ConfigurationAdmin available");
+		}
 
 		fFormToolkit.createLabel(loginBody, "Handle", SWT.NONE);
 
@@ -95,7 +105,7 @@ public class ChatPart implements IPointToPointChatListener {
 		btnLogin.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				doLogin();
+				doLogin(cm);
 				stackLayout.topControl = fmessageForm;
 				fStackComposite.layout();
 			}
@@ -147,17 +157,32 @@ public class ChatPart implements IPointToPointChatListener {
 		stackLayout.topControl = loginForm;
 	}
 
-	private void doLogin() {
-		setupTracker();
+	private void doLogin(ConfigurationAdmin cm) {
+		setupTracker(cm);
 	}
 
-	private void setupTracker() {
+	private void setupTracker(ConfigurationAdmin cm) {
 		if (btnServerMode.getSelection() == true) {
 			fTracker = new CentralisticChatTracker(this, fHandle.getText());
 		} else {
 			fTracker = new P2PChatTracker(this, fHandle.getText());
 		}
-		fTracker.setup(fServer.getText());
+		
+		if (cm != null) {
+			try {
+				Configuration configuration = cm.getConfiguration("org.eclipse.ecf.example.chat.config", "?");
+				Dictionary<String, Object> properties = configuration.getProperties();
+				if (properties == null) {
+					properties = new Hashtable<String, Object>();
+				}
+				properties.put("SERVER", fServer.getText());
+				configuration.update(properties);
+			} catch (IOException doesNotHappen) {
+				doesNotHappen.printStackTrace();
+			}
+		}
+		
+		fTracker.setup();
 		fHandle.getShell().setText(fHandle.getShell().getText() + ": " + fHandle.getText());
 	}
 

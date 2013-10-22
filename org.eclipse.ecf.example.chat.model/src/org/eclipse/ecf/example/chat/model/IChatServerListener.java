@@ -18,4 +18,12 @@ public interface IChatServerListener {
 	 */
 	String getHandle();
 
+	/**
+	 * Notifies the listener that new handles have arrived at the
+	 * {@link IChatServer}. When the {@link IChatServer#getHandles()} is
+	 * called afterwards, all handles are returned.
+	 * 
+	 * @param time
+	 */
+	void handleReceived(Long time);
 }

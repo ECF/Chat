@@ -79,4 +79,20 @@ public class CentralisticChatTracker extends ChatTracker implements IChatServerL
 			}
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ecf.example.chat.model.IChatServerListener#handleReceived(java.lang.Long)
+	 */
+	@Override
+	public void handleReceived(Long time) {
+		if (fServer != null) {
+			String[] handles = fServer.getHandles();
+			for (String handle : handles) {
+				fParticipants.put(handle, handle);
+				// TODO Distinguish between join/lefts which is currently
+				// handled by the UI layer (re-creates list in both cases)
+				fCallBack.joined(handle);
+			}
+		}
+	}
 }

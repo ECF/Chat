@@ -5,6 +5,7 @@ import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.example.chat.model.IChatServer;
 import org.eclipse.ecf.example.chat.model.IChatServerListener;
 import org.eclipse.ecf.example.chat.model.IPointToPointChatListener;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceEvent;
@@ -25,6 +26,20 @@ public class CentralisticChatTracker extends ChatTracker implements IChatServerL
 		return "(&(" + Constants.OBJECTCLASS + "="
 				+ IChatServer.class.getName()
 				+ ") (| (service.exported.interfaces=*) (endpoint.id=*) ) )";
+	}
+
+	@Override
+	public void setup() {
+		super.setup();
+		
+		// Get the initial reference if there happens to be a running server
+		final BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
+		ServiceReference<IChatServer> reference = bundleContext
+				.getServiceReference(IChatServer.class);
+		if (reference != null) {
+			this.serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED,
+					reference));
+		}
 	}
 
 	/* (non-Javadoc)

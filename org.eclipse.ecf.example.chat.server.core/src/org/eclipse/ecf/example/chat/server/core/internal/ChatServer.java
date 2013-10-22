@@ -83,7 +83,7 @@ public class ChatServer implements IChatServer {
 	
 	@Override
 	public void post(IChatMessage message) {
-		System.err.println("message:" + message.getMessage());
+		System.err.println("ChatServer received message:" + message.getMessage());
 		long time = System.currentTimeMillis();
 		synchronized (fMessages) {
 			fMessages.put(time, message);

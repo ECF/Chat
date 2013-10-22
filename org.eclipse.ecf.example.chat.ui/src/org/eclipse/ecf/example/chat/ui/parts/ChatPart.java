@@ -19,9 +19,11 @@ import java.util.Hashtable;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.example.chat.model.IPointToPointChatListener;
@@ -61,6 +63,9 @@ public class ChatPart implements IPointToPointChatListener {
 	private Button btnServerMode;
 	private ChatTracker fTracker;
 
+	@Inject
+	private UISynchronize sync;
+	
 	@PostConstruct
 	public void createComposite(final Composite parent, @Optional final ConfigurationAdmin cm, MPart part) throws UnknownHostException {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -222,7 +227,7 @@ public class ChatPart implements IPointToPointChatListener {
 	public synchronized void messageRecevied(final IChatMessage message) {
 		if (!message.getMessage().equals(fLastMessage)) {
 			fLastMessage = message.getMessage();
-			Display.getDefault().asyncExec(new Runnable() {
+			sync.asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					boolean isLocal = fHandle.getText().equals(message.getHandle());
@@ -235,7 +240,7 @@ public class ChatPart implements IPointToPointChatListener {
 
 	@Override
 	public synchronized void joined(final String handle) {
-		Display.getDefault().asyncExec(new Runnable() {
+		sync.asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				processParticipantsList();
@@ -246,7 +251,7 @@ public class ChatPart implements IPointToPointChatListener {
 
 	@Override
 	public synchronized void left(final String handle) {
-		Display.getDefault().asyncExec(new Runnable() {
+		sync.asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				processParticipantsList();

@@ -82,6 +82,8 @@ public class CentralisticChatTracker extends ChatTracker implements IChatServerL
 				fServer = (IChatServer) service;
 				System.out.println(" (" + fServer.getClass().getSimpleName()+")");
 				createService(IChatServerListener.class, this);
+				// Get all old messages since the beginning of time
+				messageReceived(0L);
 			}
 		} else if (event.getType() == ServiceEvent.UNREGISTERING) {
 			if (service instanceof IChatServer) {

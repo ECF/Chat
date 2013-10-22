@@ -52,12 +52,15 @@ public class ChatServer implements IChatServer {
 	public IChatMessage[] getMessages(Long time) {
 		synchronized (fMessages) {
 			final List<IChatMessage> result = new ArrayList<IChatMessage>();
-			final Collection<IChatMessage> values = fMessages.tailMap(
-					fMessages.floorKey(time)).values();
-			for (IChatMessage message : values) {
-				result.add(message);
+			final Long floorKey = fMessages.ceilingKey(time);
+			if (floorKey != null) {
+				final Collection<IChatMessage> values = fMessages.tailMap(
+						floorKey).values();
+				for (IChatMessage message : values) {
+					result.add(message);
+				}
 			}
-			return result.toArray(new IChatMessage[0]);
+			return result.toArray(new IChatMessage[result.size()]);
 		}
 	}
 

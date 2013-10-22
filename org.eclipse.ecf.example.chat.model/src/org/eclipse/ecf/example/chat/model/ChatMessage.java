@@ -1,12 +1,11 @@
 package org.eclipse.ecf.example.chat.model;
 
+import java.io.Serializable;
+
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 
 @SuppressWarnings("serial")
-public class ChatMessage implements IChatMessage {
-	
-	public ChatMessage() {
-	}
+public class ChatMessage implements IChatMessage, Serializable {
 
 	private String message;
 	private String handle;

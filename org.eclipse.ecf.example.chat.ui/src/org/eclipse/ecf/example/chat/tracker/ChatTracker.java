@@ -1,11 +1,10 @@
 package org.eclipse.ecf.example.chat.tracker;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.ecf.core.ContainerFactory;
 import org.eclipse.ecf.core.IContainer;
@@ -48,16 +47,8 @@ public abstract class ChatTracker implements ServiceListener {
 	protected abstract String getFilterString();
 
 	public String[] getSortedParticipants() {
-		ArrayList<String> helperList = new ArrayList<String>();
-		Collection<String> handles = fParticipants.values();
-		for (String handle : handles) {
-			if (!helperList.contains(handle)) {
-				helperList.add(handle);
-			}
-		}
-		String[] result = helperList.toArray(new String[0]);
-		Arrays.sort(result);
-		return result;
+		final Set<String> s = new TreeSet<String>(fParticipants.values());
+		return s.toArray(new String[s.size()]);
 	}
 
 	/**

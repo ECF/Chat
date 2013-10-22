@@ -73,7 +73,7 @@ public class ChatPart implements IPointToPointChatListener {
 		fFormToolkit.paintBordersFor(loginBody);
 		loginBody.setLayout(new GridLayout(3, false));
 
-		fFormToolkit.createLabel(loginBody, "Server", SWT.NONE);
+		fFormToolkit.createLabel(loginBody, "DiscoServer", SWT.NONE);
 
 		fServer = fFormToolkit.createText(loginBody, "", SWT.NONE);
 		fServer.setText("disco.ecf-project.org");
@@ -87,7 +87,7 @@ public class ChatPart implements IPointToPointChatListener {
 				+ InetAddress.getLocalHost().getCanonicalHostName());
 		fHandle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 
-		fFormToolkit.createLabel(loginBody, "Server Mode", SWT.NONE);
+		fFormToolkit.createLabel(loginBody, "Centralistic Mode", SWT.NONE);
 
 		btnServerMode = fFormToolkit.createButton(loginBody, "", SWT.CHECK);
 

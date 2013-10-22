@@ -11,7 +11,7 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceReference;
 
 public class CentralisticChatTracker extends ChatTracker implements IChatServerListener {
-	protected volatile IChatServer fServer;
+	protected volatile IChatServer fServer = new DummyChatServer();
 
 	public CentralisticChatTracker(IPointToPointChatListener listener, String handle) {
 		super(listener, handle);
@@ -32,9 +32,7 @@ public class CentralisticChatTracker extends ChatTracker implements IChatServerL
 	 */
 	@Override
 	public void publish(String message) {
-		if (fServer != null) {
-			fServer.post(new ChatMessage(message, fHandle));
-		}
+		fServer.post(new ChatMessage(message, fHandle));
 	}
 
 	/* (non-Javadoc)
@@ -42,11 +40,9 @@ public class CentralisticChatTracker extends ChatTracker implements IChatServerL
 	 */
 	@Override
 	public synchronized void messageReceived(Long time) {
-		if (fServer != null) {
-			IChatMessage[] messages = fServer.getMessages(time);
-			for (IChatMessage message : messages) {
-				fCallBack.messageRecevied(message);
-			}
+		IChatMessage[] messages = fServer.getMessages(time);
+		for (IChatMessage message : messages) {
+			fCallBack.messageRecevied(message);
 		}
 	}
 
@@ -75,7 +71,7 @@ public class CentralisticChatTracker extends ChatTracker implements IChatServerL
 		} else if (event.getType() == ServiceEvent.UNREGISTERING) {
 			if (service instanceof IChatServer) {
 				System.out.println("UnRegistered IChatServer: " + service.getClass().getSimpleName());
-				fServer = null;
+				fServer = new DummyChatServer();
 			}
 		}
 	}
@@ -85,14 +81,12 @@ public class CentralisticChatTracker extends ChatTracker implements IChatServerL
 	 */
 	@Override
 	public void handleReceived(Long time) {
-		if (fServer != null) {
-			String[] handles = fServer.getHandles();
-			for (String handle : handles) {
-				fParticipants.put(handle, handle);
-				// TODO Distinguish between join/lefts which is currently
-				// handled by the UI layer (re-creates list in both cases)
-				fCallBack.joined(handle);
-			}
+		String[] handles = fServer.getHandles();
+		for (String handle : handles) {
+			fParticipants.put(handle, handle);
+			// TODO Distinguish between join/lefts which is currently
+			// handled by the UI layer (re-creates list in both cases)
+			fCallBack.joined(handle);
 		}
 	}
 }

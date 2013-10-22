@@ -157,8 +157,7 @@ public class ChatPart implements IPointToPointChatListener {
 		} else {
 			fTracker = new P2PChatTracker(this, fHandle.getText());
 		}
-		fTracker.startZookeeperDiscovery(fServer.getText());
-		fTracker.setup();
+		fTracker.setup(fServer.getText());
 		fHandle.getShell().setText(fHandle.getShell().getText() + ": " + fHandle.getText());
 	}
 

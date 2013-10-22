@@ -6,10 +6,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.ecf.core.ContainerFactory;
-import org.eclipse.ecf.core.IContainer;
 import org.eclipse.ecf.example.chat.model.IPointToPointChatListener;
-import org.eclipse.ecf.provider.zookeeper.core.ZooDiscoveryContainerInstantiator;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceListener;
@@ -32,10 +30,15 @@ public abstract class ChatTracker implements ServiceListener {
 		FrameworkUtil.getBundle(getClass()).getBundleContext().removeServiceListener(this);
 	}
 
-	public void setup() {
+	public void setup(String discoServer) {
 		try {
-			FrameworkUtil.getBundle(getClass()).getBundleContext()
+			BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
+			bundleContext
 					.addServiceListener(this, getFilterString());
+			
+			Dictionary props = new Properties();
+			props.put("ZooDiscoveryConfig", "foobar");
+			bundleContext.registerService(String.class, discoServer, (Dictionary<String, Object>) props);
 		} catch (InvalidSyntaxException doesNotHappen) {
 			doesNotHappen.printStackTrace();
 		}
@@ -55,22 +58,6 @@ public abstract class ChatTracker implements ServiceListener {
 	 * @param message
 	 */
 	public abstract void publish(String message);
-
-	// FIXME Discovery providers should get configured via OSGi Config Admin
-	public void startZookeeperDiscovery(String server) {
-		try {
-			final IContainer singleton = ContainerFactory.getDefault().createContainer(
-					ZooDiscoveryContainerInstantiator.NAME);
-			if (singleton.getConnectedID() != null) {
-				singleton.disconnect();
-			}
-			singleton.connect(
-					singleton.getConnectNamespace().createInstance(
-							new String[] { "zoodiscovery.flavor.centralized=" + server }), null);
-		} catch (Exception doesNotHappen) {
-			doesNotHappen.printStackTrace();
-		}
-	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void createService(Class serviceType, Object aService) {

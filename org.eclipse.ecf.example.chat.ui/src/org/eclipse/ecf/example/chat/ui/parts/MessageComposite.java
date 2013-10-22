@@ -102,7 +102,7 @@ public class MessageComposite extends Composite {
 	}
 
 	protected static final int DATE_WIDTH = 80;
-	protected static final int HANDLE_WIDTH = 80;
+	protected static final int HANDLE_WIDTH = 160;
 	private GridTreeViewer fViewer;
 	private Object fParent;
 
@@ -152,6 +152,7 @@ public class MessageComposite extends Composite {
 
 		GridColumn handle = new GridColumn(grid, SWT.NONE);
 		handle.setWidth(HANDLE_WIDTH);
+		handle.setWordWrap(true);
 
 		final GridColumn messageColumn = new GridColumn(grid, SWT.NONE);
 		messageColumn.setWordWrap(true);

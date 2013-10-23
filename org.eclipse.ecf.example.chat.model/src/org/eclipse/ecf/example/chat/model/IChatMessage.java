@@ -10,12 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ecf.example.chat.model;
 
+import java.io.Serializable;
 
 /**
  * Interface representing a chart message.
  * 
  */
-public interface IChatMessage {
+public interface IChatMessage extends Serializable {
 
 	/**
 	 * Gets the verbatim message.

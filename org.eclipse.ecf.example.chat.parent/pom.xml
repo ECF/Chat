@@ -15,6 +15,7 @@
 	<modules>
 		<module>../org.eclipse.ecf.core.feature</module>
 		<module>../org.eclipse.ecf.example.chat.feature</module>
+		<module>../org.eclipse.ecf.example.chat.config</module>
 		<module>../org.eclipse.ecf.example.chat.model</module>
 		<module>../org.eclipse.ecf.example.chat.product</module>
 		<module>../org.eclipse.ecf.example.chat.bot</module>
@@ -57,14 +58,20 @@
 	<!-- (Kepler is a p2 repository containing Eclipse's annual release train) -->
 	<repositories>
 		<repository>
-			<id>Kepler</id>
+			<id>ECF</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/kepler</url>
+			<url>http://download.ecf-project.org/repo/C-HEAD-sdk.feature/lastSuccessful/archive/site.p2/</url>
 		</repository>
 		<repository>
 			<id>Nebula</id>
 			<layout>p2</layout>
 			<url> http://download.eclipse.org/technology/nebula/snapshot</url>
+		</repository>
+		<!-- e.g. org.eclipse.equinox.cm -->
+		<repository>
+			<id>Equinox</id>
+			<layout>p2</layout>
+			<url> http://download.eclipse.org/eclipse/updates/4.4milestones</url>
 		</repository>
 	</repositories>
 

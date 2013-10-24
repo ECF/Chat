@@ -119,7 +119,7 @@ public class ChatPart implements IPointToPointChatListener {
 
 		btnServerMode = fFormToolkit.createButton(loginBody, "", SWT.CHECK);
 
-		Button btnLogin = fFormToolkit.createButton(loginBody, "Login", SWT.NONE);
+		Button btnLogin = fFormToolkit.createButton(loginBody, "Go online", SWT.NONE);
 		btnLogin.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

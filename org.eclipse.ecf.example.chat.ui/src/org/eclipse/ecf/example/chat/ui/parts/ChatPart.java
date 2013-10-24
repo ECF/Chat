@@ -58,10 +58,10 @@ public class ChatPart implements IPointToPointChatListener {
 	private Text fMessage;
 	private String fLastMessage;
 	private Composite fStackComposite;
-	private final FormToolkit fFormToolkit = new FormToolkit(Display.getDefault());
+	private final FormToolkit fFormToolkit = new FormToolkit(
+			Display.getDefault());
 	private Text fServer;
 	private Text fHandle;
-	private ScrolledForm fmessageForm;
 	private Text fParticipants;
 	private SashForm sashForm;
 	private MessageComposite messageComposite;
@@ -70,23 +70,29 @@ public class ChatPart implements IPointToPointChatListener {
 
 	@Inject
 	private UISynchronize sync;
-	
+	private Composite fMessageComposite;
+
 	@PostConstruct
-	public void createComposite(final Composite parent, @Optional final ConfigurationAdmin cm, MPart part, final Shell shell) throws UnknownHostException {
+	public void createComposite(final Composite parent,
+			@Optional final ConfigurationAdmin cm, MPart part, final Shell shell)
+			throws UnknownHostException {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		fStackComposite = new Composite(parent, SWT.NONE);
 		final StackLayout stackLayout = new StackLayout();
 		fStackComposite.setLayout(stackLayout);
 
-		ScrolledForm loginForm = fFormToolkit.createScrolledForm(fStackComposite);
-		loginForm.setImage(ResourceManager.getPluginImage("org.eclipse.ecf.example.chat.product", "icons/login.gif"));
+		ScrolledForm loginForm = fFormToolkit
+				.createScrolledForm(fStackComposite);
+		loginForm.setImage(ResourceManager.getPluginImage(
+				"org.eclipse.ecf.example.chat.product", "icons/login.gif"));
 		loginForm.setFont(SWTResourceManager.getFont("Segoe UI", 11, SWT.BOLD));
 		fFormToolkit.paintBordersFor(loginForm);
 		loginForm.setText("Login");
 		loginForm.getBody().setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		Composite loginBody = fFormToolkit.createComposite(loginForm.getBody(), SWT.NONE);
+		Composite loginBody = fFormToolkit.createComposite(loginForm.getBody(),
+				SWT.NONE);
 		fFormToolkit.paintBordersFor(loginBody);
 		loginBody.setLayout(new GridLayout(3, false));
 
@@ -94,13 +100,15 @@ public class ChatPart implements IPointToPointChatListener {
 		fFormToolkit.createLabel(loginBody, "Handle", SWT.NONE);
 
 		fHandle = fFormToolkit.createText(loginBody, "", SWT.NONE);
-		if (part.getElementId().equals("org.eclipse.ecf.example.chat.ui.part.0")) {
+		if (part.getElementId()
+				.equals("org.eclipse.ecf.example.chat.ui.part.0")) {
 			fHandle.setText(System.getProperty("user.name", "nobody") + "@"
 					+ InetAddress.getLocalHost().getCanonicalHostName());
 		} else {
 			fHandle.setText(part.getLabel());
 		}
-		fHandle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
+		fHandle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2,
+				1));
 
 		// Server
 		fFormToolkit.createLabel(loginBody, "DiscoServer", SWT.NONE);
@@ -108,10 +116,11 @@ public class ChatPart implements IPointToPointChatListener {
 		fServer = fFormToolkit.createText(loginBody, "", SWT.NONE);
 		fServer.setText("disco.ecf-project.org");
 		fServer.selectAll();
-		fServer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		fServer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2,
+				1));
 		if (cm == null) {
-			 fServer.setEnabled(false);
-			 fServer.setText("No discovery and/or ConfigurationAdmin available");
+			fServer.setEnabled(false);
+			fServer.setText("No discovery and/or ConfigurationAdmin available");
 		}
 
 		// centralistic mode
@@ -119,15 +128,17 @@ public class ChatPart implements IPointToPointChatListener {
 
 		btnServerMode = fFormToolkit.createButton(loginBody, "", SWT.CHECK);
 
-		Button btnLogin = fFormToolkit.createButton(loginBody, "Go online", SWT.NONE);
+		Button btnLogin = fFormToolkit.createButton(loginBody, "Go online",
+				SWT.NONE);
 		btnLogin.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final boolean serverMode = btnServerMode.getSelection();
 				final String handle = fHandle.getText();
 				final String discoServer = fServer.getText();
-				
-				final ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
+
+				final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
+						shell);
 				try {
 					dialog.run(true, false, new IRunnableWithProgress() {
 
@@ -142,7 +153,7 @@ public class ChatPart implements IPointToPointChatListener {
 									fHandle.getShell().setText(
 											fHandle.getShell().getText() + ": "
 													+ fHandle.getText());
-									stackLayout.topControl = fmessageForm;
+									stackLayout.topControl = fMessageComposite;
 									fStackComposite.layout();
 								}
 							});
@@ -155,23 +166,28 @@ public class ChatPart implements IPointToPointChatListener {
 				}
 			}
 		});
-		btnLogin.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		btnLogin.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false,
+				false, 1, 1));
 
-		fmessageForm = fFormToolkit.createScrolledForm(fStackComposite);
-		fmessageForm.setFont(SWTResourceManager.getFont("Segoe UI", 11, SWT.BOLD));
-		fmessageForm.setImage(ResourceManager.getPluginImage("org.eclipse.ecf.example.chat.product",
-				"icons/messages.png"));
-		fFormToolkit.paintBordersFor(fmessageForm);
-		fmessageForm.setText("Messages");
-		fmessageForm.getBody().setLayout(new GridLayout(3, false));
+		stackLayout.topControl = loginForm;
 
-		Composite messageBody = fFormToolkit.createComposite(fmessageForm.getBody(), SWT.NONE);
-		messageBody.setLayout(new FillLayout(SWT.HORIZONTAL));
-		messageBody.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
-		messageBody.setBounds(0, 0, 64, 64);
-		fFormToolkit.paintBordersFor(messageBody);
+		fMessageComposite = fFormToolkit.createComposite(fStackComposite, SWT.NONE);
+		fFormToolkit.paintBordersFor(fMessageComposite);
+		GridLayout gl_fMessageComposite = new GridLayout(2, false);
+		fMessageComposite.setLayout(gl_fMessageComposite);
 
-		sashForm = new SashForm(messageBody, SWT.SMOOTH);
+		Composite composite = fFormToolkit.createComposite(fMessageComposite, SWT.NONE);
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,
+				2, 1));
+		GridLayout gl_fMessageForm = new GridLayout(1, false);
+		gl_fMessageForm.marginHeight = 0;
+		gl_fMessageForm.marginWidth = 0;
+		composite.setLayout(gl_fMessageForm);
+		fFormToolkit.paintBordersFor(composite);
+
+		sashForm = new SashForm(composite, SWT.SMOOTH);
+		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1,
+				1));
 		fFormToolkit.adapt(sashForm);
 		fFormToolkit.paintBordersFor(sashForm);
 
@@ -179,15 +195,21 @@ public class ChatPart implements IPointToPointChatListener {
 		fFormToolkit.adapt(messageComposite);
 		fFormToolkit.paintBordersFor(messageComposite);
 
-		fParticipants = fFormToolkit.createText(sashForm, "", SWT.READ_ONLY | SWT.MULTI);
-		fParticipants.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE));
-		fParticipants.setFont(SWTResourceManager.getFont("Courier", 9, SWT.BOLD));
+		fParticipants = fFormToolkit.createText(sashForm, "", SWT.READ_ONLY
+				| SWT.MULTI);
+		fParticipants.setForeground(SWTResourceManager
+				.getColor(SWT.COLOR_DARK_BLUE));
+		fParticipants.setFont(SWTResourceManager
+				.getFont("Courier", 9, SWT.BOLD));
 		sashForm.setWeights(new int[] { 4, 1 });
 
-		fMessage = new Text(fmessageForm.getBody(), SWT.BORDER);
-		fMessage.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		fMessage = new Text(fMessageComposite, SWT.BORDER);
+		fMessage.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false,
+				1, 1));
 
-		Button btnSend = new Button(fmessageForm.getBody(), SWT.NONE);
+		Button btnSend = new Button(fMessageComposite, SWT.NONE);
+		btnSend.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1,
+				1));
 		btnSend.setText("Send");
 		btnSend.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -198,25 +220,27 @@ public class ChatPart implements IPointToPointChatListener {
 			}
 		});
 		btnSend.getShell().setDefaultButton(btnSend);
-
-		stackLayout.topControl = loginForm;
 	}
 
-	private void doLogin(boolean serverMode, String handle, String discoServer, ConfigurationAdmin cm) {
+	private void doLogin(boolean serverMode, String handle, String discoServer,
+			ConfigurationAdmin cm) {
 		setupTracker(serverMode, handle, discoServer, cm);
 	}
 
-	private void setupTracker(boolean serverMode, String handle, String discoServer, ConfigurationAdmin cm) {
+	private void setupTracker(boolean serverMode, String handle,
+			String discoServer, ConfigurationAdmin cm) {
 		if (serverMode == true) {
 			fTracker = new CentralisticChatTracker(this, handle);
 		} else {
 			fTracker = new P2PChatTracker(this, handle);
 		}
-		
+
 		if (cm != null) {
 			try {
-				Configuration configuration = cm.getConfiguration("org.eclipse.ecf.example.chat.config", "?");
-				Dictionary<String, Object> properties = configuration.getProperties();
+				Configuration configuration = cm.getConfiguration(
+						"org.eclipse.ecf.example.chat.config", "?");
+				Dictionary<String, Object> properties = configuration
+						.getProperties();
 				if (properties == null) {
 					properties = new Hashtable<String, Object>();
 				}
@@ -226,7 +250,7 @@ public class ChatPart implements IPointToPointChatListener {
 				doesNotHappen.printStackTrace();
 			}
 		}
-		
+
 		fTracker.setup();
 	}
 
@@ -264,8 +288,10 @@ public class ChatPart implements IPointToPointChatListener {
 			sync.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					boolean isLocal = fHandle.getText().equals(message.getHandle());
-					messageComposite.addItem(new ChatElement(fLastMessage, message.getHandle(), new Date(), isLocal));
+					boolean isLocal = fHandle.getText().equals(
+							message.getHandle());
+					messageComposite.addItem(new ChatElement(fLastMessage,
+							message.getHandle(), new Date(), isLocal));
 				}
 			});
 		}
@@ -278,7 +304,8 @@ public class ChatPart implements IPointToPointChatListener {
 			@Override
 			public void run() {
 				processParticipantsList();
-				messageComposite.addItem(new ChatElement(handle, new Date(), ChatElement.State.JOINED));
+				messageComposite.addItem(new ChatElement(handle, new Date(),
+						ChatElement.State.JOINED));
 			}
 		});
 	}
@@ -289,8 +316,9 @@ public class ChatPart implements IPointToPointChatListener {
 			@Override
 			public void run() {
 				processParticipantsList();
-				if(!messageComposite.isDisposed()) {
-					messageComposite.addItem(new ChatElement(handle, new Date(), ChatElement.State.LEFT));
+				if (!messageComposite.isDisposed()) {
+					messageComposite.addItem(new ChatElement(handle,
+							new Date(), ChatElement.State.LEFT));
 				}
 			}
 		});

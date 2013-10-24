@@ -8,7 +8,6 @@ import org.eclipse.ecf.example.chat.model.ChatMessage;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.example.chat.model.IChatServer;
 import org.eclipse.ecf.example.chat.model.IChatServerListener;
-import org.eclipse.ecf.example.chat.model.IPointToPointChatListener;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;

@@ -2,7 +2,6 @@ package org.eclipse.ecf.example.chat.tracker;
 
 import org.eclipse.ecf.example.chat.model.ChatMessage;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
-import org.eclipse.ecf.example.chat.model.IPointToPointChatListener;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;

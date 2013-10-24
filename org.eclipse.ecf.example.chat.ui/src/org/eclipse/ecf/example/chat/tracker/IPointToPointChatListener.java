@@ -1,4 +1,6 @@
-package org.eclipse.ecf.example.chat.model;
+package org.eclipse.ecf.example.chat.tracker;
+
+import org.eclipse.ecf.example.chat.model.IChatMessage;
 
 public interface IPointToPointChatListener {
 

@@ -25,6 +25,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.GridData;
 
 public class MessageComposite extends Composite {
 	private Color fGray;
@@ -111,6 +114,7 @@ public class MessageComposite extends Composite {
 	protected static final int HANDLE_WIDTH = 160;
 	private GridTreeViewer fViewer;
 	private Object fParent;
+	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 
 	public static void main(String[] args) {
 
@@ -146,25 +150,37 @@ public class MessageComposite extends Composite {
 	 */
 	public MessageComposite(Composite parent, int style) {
 		super(parent, style);
-		setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		fGray = Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
 		fGreen = Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN);
 		fRed = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
-
-		fViewer = new GridTreeViewer(this, SWT.BORDER | SWT.V_SCROLL);
-		final Grid grid = fViewer.getGrid();
-
-		GridColumn Date = new GridColumn(grid, SWT.NONE);
-		Date.setWidth(DATE_WIDTH);
-
-		GridColumn handle = new GridColumn(grid, SWT.NONE);
-		handle.setWidth(HANDLE_WIDTH);
-		handle.setWordWrap(true);
-
-		final GridColumn messageColumn = new GridColumn(grid, SWT.NONE);
-		messageColumn.setWordWrap(true);
-		messageColumn.setWidth(150);
+		GridLayout gridLayout = new GridLayout(1, false);
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		setLayout(gridLayout);
+		
+		Composite composite = formToolkit.createComposite(this, SWT.NONE);
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		formToolkit.paintBordersFor(composite);
+				GridLayout gl_composite = new GridLayout(1, false);
+				gl_composite.marginWidth = 0;
+				gl_composite.marginHeight = 0;
+				composite.setLayout(gl_composite);
+		
+				fViewer = new GridTreeViewer(composite, SWT.BORDER | SWT.V_SCROLL);
+				final Grid grid = fViewer.getGrid();
+				grid.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+				
+						GridColumn Date = new GridColumn(grid, SWT.NONE);
+						Date.setWidth(DATE_WIDTH);
+						
+								GridColumn handle = new GridColumn(grid, SWT.NONE);
+								handle.setWidth(HANDLE_WIDTH);
+								handle.setWordWrap(true);
+								
+										final GridColumn messageColumn = new GridColumn(grid, SWT.NONE);
+										messageColumn.setWordWrap(true);
+										messageColumn.setWidth(150);
 		fViewer.setContentProvider(new ContentProvider());
 		fViewer.setLabelProvider(new ViewerLabelProvider());
 		messageColumn.addControlListener(new ControlAdapter() {
@@ -182,9 +198,9 @@ public class MessageComposite extends Composite {
 				calculateHeight();
 			}
 		});
+		fViewer.setInput(fParent);
 
 		fParent = new Object();
-		fViewer.setInput(fParent);
 
 	}
 

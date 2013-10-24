@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.8"?><target name="ChatTarget" sequenceNumber="25">
+<locations>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
+<unit id="org.eclipse.nebula.widgets.paperclips.feature.feature.group" version="2.0.0.201310241250"/>
+<unit id="org.eclipse.nebula.effects.stw.feature.feature.group" version="1.0.0.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.grid.feature.feature.group" version="1.0.0.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.oscilloscope.feature.feature.group" version="1.2.0.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.calendarcombo.feature.feature.group" version="1.0.0.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.gallery.feature.feature.group" version="1.0.0.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.xviewer.feature.feature.group" version="0.9.9.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.pshelf.css.feature.feature.group" version="1.0.0.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.pshelf.feature.feature.group" version="1.0.0.201310241250"/>
+<unit id="org.eclipse.nebula.visualization.feature.feature.group" version="0.9.9.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.tablecombo.feature.feature.group" version="1.0.0.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.pgroup.feature.feature.group" version="1.0.0.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.cdatetime.feature.feature.group" version="0.14.0.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.ganttchart.feature.feature.group" version="1.0.0.201310241250"/>
+<unit id="org.eclipse.nebula.cwt.feature.feature.group" version="0.9.0.201310241250"/>
+<unit id="org.eclipse.nebula.widgets.compositetable.feature.feature.group" version="1.0.0.201310241250"/>
+<repository location="http://download.eclipse.org/technology/nebula/snapshot"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
+<unit id="org.eclipse.ecf.core.source.feature.group" version="3.7.1.v20131023-1444"/>
+<unit id="org.eclipse.ecf.core.feature.group" version="3.7.1.v20131023-1444"/>
+<repository location="http://download.ecf-project.org/repo/C-HEAD-sdk.feature/lastSuccessful/archive/site.p2/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
+<unit id="org.eclipse.equinox.sdk.feature.group" version="3.10.0.v20130918-2133"/>
+<unit id="org.eclipse.platform.sdk" version="4.4.0.I20130918-2000"/>
+<unit id="org.eclipse.sdk.ide" version="4.4.0.I20130918-2000"/>
+<unit id="org.eclipse.platform.ide" version="4.4.0.I20130918-2000"/>
+<repository location="http://download.eclipse.org/eclipse/updates/4.4milestones"/>
+</location>
+</locations>
+</target>

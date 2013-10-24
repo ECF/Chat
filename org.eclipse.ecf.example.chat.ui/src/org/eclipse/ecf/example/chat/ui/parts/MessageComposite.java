@@ -31,9 +31,9 @@ import org.eclipse.swt.layout.GridData;
 
 public class MessageComposite extends Composite {
 	private Color fGray;
-	private Color fGreen;	
+	private Color fGreen;
 	private Color fRed;
-	
+
 	private static class ContentProvider implements ITreeContentProvider {
 		private Object newInput;
 
@@ -65,7 +65,8 @@ public class MessageComposite extends Composite {
 		}
 	}
 
-	private class ViewerLabelProvider extends LabelProvider implements IColorProvider, ITableLabelProvider {
+	private class ViewerLabelProvider extends LabelProvider implements
+			IColorProvider, ITableLabelProvider {
 
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
@@ -114,7 +115,8 @@ public class MessageComposite extends Composite {
 	protected static final int HANDLE_WIDTH = 160;
 	private GridTreeViewer fViewer;
 	private Object fParent;
-	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
+	private final FormToolkit formToolkit = new FormToolkit(
+			Display.getDefault());
 
 	public static void main(String[] args) {
 
@@ -128,8 +130,8 @@ public class MessageComposite extends Composite {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				com.addItem(new ChatElement("text text text text " + e.time, "handle", Calendar.getInstance().getTime(),
-						true));
+				com.addItem(new ChatElement("text text text text " + e.time,
+						"handle", Calendar.getInstance().getTime(), true));
 			}
 		});
 
@@ -158,29 +160,30 @@ public class MessageComposite extends Composite {
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		setLayout(gridLayout);
-		
+
 		Composite composite = formToolkit.createComposite(this, SWT.NONE);
-		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1,
+				1));
 		formToolkit.paintBordersFor(composite);
-				GridLayout gl_composite = new GridLayout(1, false);
-				gl_composite.marginWidth = 0;
-				gl_composite.marginHeight = 0;
-				composite.setLayout(gl_composite);
-		
-				fViewer = new GridTreeViewer(composite, SWT.BORDER | SWT.V_SCROLL);
-				final Grid grid = fViewer.getGrid();
-				grid.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-				
-						GridColumn Date = new GridColumn(grid, SWT.NONE);
-						Date.setWidth(DATE_WIDTH);
-						
-								GridColumn handle = new GridColumn(grid, SWT.NONE);
-								handle.setWidth(HANDLE_WIDTH);
-								handle.setWordWrap(true);
-								
-										final GridColumn messageColumn = new GridColumn(grid, SWT.NONE);
-										messageColumn.setWordWrap(true);
-										messageColumn.setWidth(150);
+		GridLayout gl_composite = new GridLayout(1, false);
+		gl_composite.marginWidth = 0;
+		gl_composite.marginHeight = 0;
+		composite.setLayout(gl_composite);
+
+		fViewer = new GridTreeViewer(composite, SWT.BORDER | SWT.V_SCROLL);
+		final Grid grid = fViewer.getGrid();
+		grid.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+
+		GridColumn Date = new GridColumn(grid, SWT.NONE);
+		Date.setWidth(DATE_WIDTH);
+
+		GridColumn handle = new GridColumn(grid, SWT.NONE);
+		handle.setWidth(HANDLE_WIDTH);
+		handle.setWordWrap(true);
+
+		final GridColumn messageColumn = new GridColumn(grid, SWT.NONE);
+		messageColumn.setWordWrap(true);
+		messageColumn.setWidth(150);
 		fViewer.setContentProvider(new ContentProvider());
 		fViewer.setLabelProvider(new ViewerLabelProvider());
 		messageColumn.addControlListener(new ControlAdapter() {
@@ -198,9 +201,9 @@ public class MessageComposite extends Composite {
 				calculateHeight();
 			}
 		});
-		fViewer.setInput(fParent);
 
 		fParent = new Object();
+		fViewer.setInput(fParent);
 
 	}
 
@@ -215,11 +218,16 @@ public class MessageComposite extends Composite {
 		// Disable the check that prevents subclassing of SWT components
 	}
 
+	/**
+	 * Calculate the size of the GridColumn and sets the height of the item
+	 * accordingly.
+	 */
 	protected void calculateHeight() {
 		for (GridItem item : fViewer.getGrid().getItems()) {
 			GC gc = new GC(item.getDisplay());
 			GridColumn gridColumn = fViewer.getGrid().getColumn(2);
-			Point textBounds = gridColumn.getCellRenderer().computeSize(gc, gridColumn.getWidth(), SWT.DEFAULT, item);
+			Point textBounds = gridColumn.getCellRenderer().computeSize(gc,
+					gridColumn.getWidth(), SWT.DEFAULT, item);
 			gc.dispose();
 			item.setHeight(textBounds.y);
 		}

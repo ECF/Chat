@@ -66,6 +66,7 @@ public abstract class ChatTracker implements ServiceListener {
 		// by service (wildcard)
 		props.put("service.exported.interfaces", "*");
 		// add OSGi service property specifying config
+		// Could also use "ecf.generic.server" as distribution provider
 		props.put("service.exported.configs", "ecf.r_osgi.peer");
 		// register remote service
 		serviceRegistration = FrameworkUtil.getBundle(getClass()).getBundleContext()

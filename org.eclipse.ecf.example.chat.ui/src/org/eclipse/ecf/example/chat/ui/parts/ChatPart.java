@@ -90,17 +90,7 @@ public class ChatPart implements IPointToPointChatListener {
 		fFormToolkit.paintBordersFor(loginBody);
 		loginBody.setLayout(new GridLayout(3, false));
 
-		fFormToolkit.createLabel(loginBody, "DiscoServer", SWT.NONE);
-
-		fServer = fFormToolkit.createText(loginBody, "", SWT.NONE);
-		fServer.setText("disco.ecf-project.org");
-		fServer.selectAll();
-		fServer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-		if (cm == null) {
-			 fServer.setEnabled(false);
-			 fServer.setText("No discovery and/or ConfigurationAdmin available");
-		}
-
+		// Handle
 		fFormToolkit.createLabel(loginBody, "Handle", SWT.NONE);
 
 		fHandle = fFormToolkit.createText(loginBody, "", SWT.NONE);
@@ -112,6 +102,19 @@ public class ChatPart implements IPointToPointChatListener {
 		}
 		fHandle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 
+		// Server
+		fFormToolkit.createLabel(loginBody, "DiscoServer", SWT.NONE);
+
+		fServer = fFormToolkit.createText(loginBody, "", SWT.NONE);
+		fServer.setText("disco.ecf-project.org");
+		fServer.selectAll();
+		fServer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		if (cm == null) {
+			 fServer.setEnabled(false);
+			 fServer.setText("No discovery and/or ConfigurationAdmin available");
+		}
+
+		// centralistic mode
 		fFormToolkit.createLabel(loginBody, "Centralistic Mode", SWT.NONE);
 
 		btnServerMode = fFormToolkit.createButton(loginBody, "", SWT.CHECK);

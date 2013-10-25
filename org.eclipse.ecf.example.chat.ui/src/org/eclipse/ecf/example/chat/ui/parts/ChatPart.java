@@ -139,7 +139,12 @@ public class ChatPart implements IPointToPointChatListener {
 			public void widgetSelected(SelectionEvent e) {
 				final boolean serverMode = btnServerMode.getSelection();
 				final String handle = fHandle.getText();
-				final URI uri = URI.create(fServer.getText());
+				final URI uri;
+				if (fServer.isEnabled()) {
+					uri = URI.create(fServer.getText());
+				} else {
+					uri = URI.create("no://host");
+				}
 				
 				final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
 						shell);

@@ -13,6 +13,8 @@ package org.eclipse.ecf.example.chat.ui.parts;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Dictionary;
@@ -37,6 +39,8 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -114,7 +118,7 @@ public class ChatPart implements IPointToPointChatListener {
 		fFormToolkit.createLabel(loginBody, "DiscoServer", SWT.NONE);
 
 		fServer = fFormToolkit.createText(loginBody, "", SWT.NONE);
-		fServer.setText("disco.ecf-project.org");
+		fServer.setText("zk://disco.ecf-project.org");
 		fServer.selectAll();
 		fServer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2,
 				1));
@@ -128,15 +132,15 @@ public class ChatPart implements IPointToPointChatListener {
 
 		btnServerMode = fFormToolkit.createButton(loginBody, "", SWT.CHECK);
 
-		Button btnLogin = fFormToolkit.createButton(loginBody, "Go online",
+		final Button btnLogin = fFormToolkit.createButton(loginBody, "Go online",
 				SWT.NONE);
 		btnLogin.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final boolean serverMode = btnServerMode.getSelection();
 				final String handle = fHandle.getText();
-				final String discoServer = fServer.getText();
-
+				final URI uri = URI.create(fServer.getText());
+				
 				final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
 						shell);
 				try {
@@ -146,7 +150,7 @@ public class ChatPart implements IPointToPointChatListener {
 						public void run(IProgressMonitor monitor)
 								throws InvocationTargetException,
 								InterruptedException {
-							doLogin(serverMode, handle, discoServer, cm);
+							doLogin(serverMode, handle, uri.getHost(), cm);
 							sync.syncExec(new Runnable() {
 								@Override
 								public void run() {
@@ -168,6 +172,27 @@ public class ChatPart implements IPointToPointChatListener {
 		});
 		btnLogin.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false,
 				false, 1, 1));
+		
+		// Only allow to go only on a correc URI
+		fServer.addModifyListener(new ModifyListener() {
+			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (fServer.isEnabled()) {
+					String text = fServer.getText();
+					try {
+						URI uri = new URI(text);
+						if (uri.getScheme() != null && uri.getHost() != null) {
+							btnLogin.setEnabled(true);
+							return;
+						}
+					} catch (URISyntaxException e1) {
+					}
+					btnLogin.setEnabled(false);
+				}
+			}
+		});
+
 
 		stackLayout.topControl = loginForm;
 

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="ECF Chat Server">
-   <implementation class="org.eclipse.ecf.example.chat.server.core.internal.ChatServer"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.ecf.example.chat.server.core.asyncChatServer">
+   <implementation class="org.eclipse.ecf.example.chat.server.core.internal.AsyncChatServer"/>
    <reference bind="bindListener" cardinality="0..n" interface="org.eclipse.ecf.example.chat.model.IChatServerListener" name="IChatServerListener" policy="dynamic" unbind="unbindListener"/>
    <service>
       <provide interface="org.eclipse.ecf.example.chat.model.IChatServer"/>
    </service>
    <property name="service.exported.interfaces" type="String" value="*"/>
    <property name="service.exported.configs" type="String" value="ecf.r_osgi.peer"/>
-   <property name="service.ranking" type="Integer" value="9999"/>
+   <property name="service.ranking" type="Integer" value="99999"/>
 </scr:component>

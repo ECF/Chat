@@ -30,7 +30,7 @@ public class ChatServer implements IChatServer {
 				.getBundleContext();
 	}
 
-	private Set<IChatServerListener> getChatListeners() {
+	protected Set<IChatServerListener> getChatListeners() {
 		final Set<IChatServerListener> res = new HashSet<IChatServerListener>();
 		try {
 			@SuppressWarnings("unchecked")

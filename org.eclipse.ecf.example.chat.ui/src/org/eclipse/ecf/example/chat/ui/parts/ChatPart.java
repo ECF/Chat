@@ -283,6 +283,22 @@ public class ChatPart implements IPointToPointChatListener {
 
 		fTracker.setup();
 	}
+	
+	// If CM comes up or goes down dynamically
+	@Inject
+	private void setConfigAdmin(@Optional final ConfigurationAdmin cm, UISynchronize sync) {
+		sync.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				if (cm == null) {
+					fServer.setEnabled(false);
+				} else {
+					fServer.setEnabled(true);
+					fServer.setText("zk://disco.ecf-project.org");
+				}
+			}
+		});
+	}
 
 	private synchronized void processParticipantsList() {
 		String[] participants = fTracker.getSortedParticipants();

@@ -95,7 +95,6 @@ public class ChatServer implements IChatServer {
 		doBackGroundNotify(getChatListeners(), time);
 	}
 
-	// TODO find a good strategy for unresponsive listeners
 	private void doBackGroundNotify(
 			Collection<IChatServerListener> currentListeners, final Long time) {
 		for (final IChatServerListener listener : currentListeners) {

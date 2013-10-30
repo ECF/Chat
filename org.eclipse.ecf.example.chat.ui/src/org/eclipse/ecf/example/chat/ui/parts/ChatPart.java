@@ -106,8 +106,15 @@ public class ChatPart implements IPointToPointChatListener {
 		fHandle = fFormToolkit.createText(loginBody, "", SWT.NONE);
 		if (part.getElementId()
 				.equals("org.eclipse.ecf.example.chat.ui.part.0")) {
+			String canonicalHostName = "";
+			try {
+				canonicalHostName = InetAddress.getLocalHost().getCanonicalHostName();
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+				canonicalHostName = "unknown";
+			}
 			fHandle.setText(System.getProperty("user.name", "nobody") + "@"
-					+ InetAddress.getLocalHost().getCanonicalHostName());
+					+ canonicalHostName);
 		} else {
 			fHandle.setText(part.getLabel());
 		}

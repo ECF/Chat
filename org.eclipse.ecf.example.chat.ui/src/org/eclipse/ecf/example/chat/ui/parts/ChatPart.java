@@ -251,9 +251,30 @@ public class ChatPart implements IPointToPointChatListener {
 		btnSend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				fTracker.publish(fMessage.getText());
-				fMessage.setText("");
-				fMessage.setFocus();
+				final String text = fMessage.getText();
+				final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
+						shell);
+				try {
+					dialog.run(true, false, new IRunnableWithProgress() {
+						@Override
+						public void run(IProgressMonitor monitor)
+								throws InvocationTargetException,
+								InterruptedException {
+							fTracker.publish(text);
+							sync.syncExec(new Runnable() {
+								@Override
+								public void run() {
+									fMessage.setText("");
+									fMessage.setFocus();
+								}
+							});
+						}
+					});
+				} catch (InvocationTargetException doesNotHappen) {
+					doesNotHappen.printStackTrace();
+				} catch (InterruptedException doesNotHappen) {
+					doesNotHappen.printStackTrace();
+				}
 			}
 		});
 		btnSend.getShell().setDefaultButton(btnSend);

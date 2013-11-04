@@ -7,6 +7,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class P2PChatTracker extends ChatTracker {
 	
@@ -53,7 +54,8 @@ public class P2PChatTracker extends ChatTracker {
 	@Override
 	protected String getFilterString() {
 		return "(&(" + Constants.OBJECTCLASS + "=" + IChatMessage.class.getName()
-				+ ") (| (service.exported.interfaces=*) (endpoint.id=*) ) )";
+				+ ") (| (" + RemoteConstants.SERVICE_EXPORTED_INTERFACES
+						+ "=*) (" + RemoteConstants.ENDPOINT_ID + "=*) ) )";
 	}
 	
 	/* (non-Javadoc)

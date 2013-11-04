@@ -11,6 +11,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public abstract class ChatTracker implements ServiceListener {
 	protected final Hashtable<Object, String> fParticipants = new Hashtable<Object, String>();
@@ -64,10 +65,10 @@ public abstract class ChatTracker implements ServiceListener {
 		Dictionary<Object, Object> props = new Properties();
 		// add OSGi service property indicated export of all interfaces exposed
 		// by service (wildcard)
-		props.put("service.exported.interfaces", "*");
+		props.put(RemoteConstants.SERVICE_EXPORTED_INTERFACES, "*");
 		// add OSGi service property specifying config
 		// Could also use "ecf.generic.server" as distribution provider
-		props.put("service.exported.configs", "ecf.r_osgi.peer");
+		props.put(RemoteConstants.SERVICE_EXPORTED_CONFIGS, "ecf.r_osgi.peer");
 		// register remote service
 		serviceRegistration = FrameworkUtil.getBundle(getClass()).getBundleContext()
 				.registerService(serviceType.getName(), aService, (Dictionary) props);

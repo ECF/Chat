@@ -16,23 +16,28 @@ public class AsyncChatServer extends ChatServer implements IChatServer {
 	public synchronized String[] getHandles() {
 		final Set<IChatServerListener> listeners = getChatListeners();
 		final List<String> res = new ArrayList<String>(listeners.size());
+		final List<Future<String>> futures = new ArrayList<Future<String>>();
+		
+		// 1. Schedule remote calls in parallel
 		for (final IChatServerListener listener : listeners) {
-			// Break out of pure OSGi remote services and use ECF's vendor lock-in :)
-			// (Check instanceof here due to
-			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=420290#c7)
+			// parallelize all remote calls at once without collecting their results
 			if (listener instanceof IChatServerListenerAsync) {
 				IChatServerListenerAsync async = (IChatServerListenerAsync) listener;
-				Future<String> future = async.getHandleAsync();
-				try {
-					res.add((String) future.get());
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					e.printStackTrace();
-				}
+				futures.add(async.getHandleAsync());
 			}
 		}
 
+		// 2. Collect results of remote calls
+		for (Future<String> future : futures) {
+			try {
+				res.add((String) future.get());
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		return res.toArray(new String[res.size()]);
 	}
 }

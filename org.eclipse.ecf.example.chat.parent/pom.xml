@@ -40,6 +40,9 @@
                     <artifactId>target-platform-configuration</artifactId>
                     <version>${tycho.version}</version>
                     <configuration>
+						<!-- consume certain dependencies from a maven repo instead of from the p2 repos listed in the .target -->
+						<!-- (see repository definition above) -->
+						<pomDependencies>consider</pomDependencies>
                             <!-- configure the p2 target environments for multi-platform build -->
                             <!-- The strings ("linux", "gtk", "x86"...) are defined by the OSGi spec -->
                             <environments>
@@ -100,6 +103,21 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	
+	<!-- Extra dependencies for which there is no p2 repo available but which are hosted in a plain maven repo -->
+	<!-- See popDependencies consider below) -->
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.webconsole</artifactId>
+			<version>4.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.log</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+	</dependencies>
 
 	<!-- (Kepler is a p2 repository containing Eclipse's annual release train) -->
 	<repositories>
@@ -118,6 +136,11 @@
 			<id>Equinox</id>
 			<layout>p2</layout>
 			<url> http://download.eclipse.org/eclipse/updates/4.4milestones</url>
+		</repository>
+		<repository>
+			<id>Orbit</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/tools/orbit/downloads/drops/R20130827064939/repository/</url>
 		</repository>
 	</repositories>
 

@@ -14,7 +14,8 @@
 -Dzoodiscovery.autoStart
 -Dch.ethz.iks.r_osgi.topic.filter=org/eclipse/e4/*
 -Declipse.ignoreApp=true
--Dosgi.noShutdown=true</vmArgs>
+-Dosgi.noShutdown=true
+-Dorg.osgi.service.http.port=9980</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 

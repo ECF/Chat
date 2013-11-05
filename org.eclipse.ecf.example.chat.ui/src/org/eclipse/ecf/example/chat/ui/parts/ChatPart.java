@@ -162,7 +162,7 @@ public class ChatPart implements IPointToPointChatListener {
 						public void run(IProgressMonitor monitor)
 								throws InvocationTargetException,
 								InterruptedException {
-							doLogin(serverMode, handle, uri.getHost(), cm);
+							doLogin(serverMode, handle, uri, cm);
 							sync.syncExec(new Runnable() {
 								@Override
 								public void run() {
@@ -280,13 +280,13 @@ public class ChatPart implements IPointToPointChatListener {
 		btnSend.getShell().setDefaultButton(btnSend);
 	}
 
-	private void doLogin(boolean serverMode, String handle, String discoServer,
+	private void doLogin(boolean serverMode, String handle, URI discoServer,
 			ConfigurationAdmin cm) {
 		setupTracker(serverMode, handle, discoServer, cm);
 	}
 
 	private void setupTracker(boolean serverMode, String handle,
-			String discoServer, ConfigurationAdmin cm) {
+			URI discoServer, ConfigurationAdmin cm) {
 		if (serverMode == true) {
 			fTracker = new CentralisticChatTracker(this, handle);
 		} else {
@@ -302,7 +302,7 @@ public class ChatPart implements IPointToPointChatListener {
 				if (properties == null) {
 					properties = new Hashtable<String, Object>();
 				}
-				properties.put("SERVER", discoServer);
+				properties.put("SERVER", discoServer.toASCIIString());
 				configuration.update(properties);
 			} catch (IOException doesNotHappen) {
 				doesNotHappen.printStackTrace();

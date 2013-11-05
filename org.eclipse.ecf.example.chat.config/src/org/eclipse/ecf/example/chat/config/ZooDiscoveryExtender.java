@@ -1,5 +1,6 @@
 package org.eclipse.ecf.example.chat.config;
 
+import java.net.URI;
 import java.util.Dictionary;
 
 import org.eclipse.ecf.core.ContainerFactory;
@@ -12,16 +13,22 @@ public class ZooDiscoveryExtender implements ManagedService {
 
 	private boolean init = false;
 	
-	private void startZooKeeper(String server) {
+	private void startZooKeeper(URI server) {
 		try {
 			final IContainer singleton = ContainerFactory.getDefault().createContainer(
 					ZooDiscoveryContainerInstantiator.NAME);
 			if (singleton.getConnectedID() != null) {
 				singleton.disconnect();
 			}
+			String string = null;
+			if (server.getPort() != -1) {
+				string  = server.getHost() + ":" + server.getPort();
+			} else {
+				string = server.getHost() + ":2181";
+			}
 			singleton.connect(
 					singleton.getConnectNamespace().createInstance(
-							new String[] { "zoodiscovery.flavor.centralized=" + server }), null);
+							new String[] { "zoodiscovery.flavor.centralized=" + string }), null);
 		} catch (Exception doesNotHappen) {
 			doesNotHappen.printStackTrace();
 		}
@@ -32,7 +39,7 @@ public class ZooDiscoveryExtender implements ManagedService {
 			throws ConfigurationException {
 		if (properties != null && !init) {
 			init = true;
-			String server = (String) properties.get("SERVER");
+			URI server = URI.create((String) properties.get("SERVER"));
 			startZooKeeper(server);
 		}
 	}

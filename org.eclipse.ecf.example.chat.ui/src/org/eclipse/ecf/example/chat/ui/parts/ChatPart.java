@@ -60,7 +60,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 
 public class ChatPart implements IPointToPointChatListener {
 	private Text fMessage;
-	private String fLastMessage;
+	private IChatMessage fLastMessage;
 	private Composite fStackComposite;
 	private final FormToolkit fFormToolkit = new FormToolkit(
 			Display.getDefault());
@@ -357,19 +357,28 @@ public class ChatPart implements IPointToPointChatListener {
 
 	@Override
 	public synchronized void messageRecevied(final IChatMessage message) {
-		if (message.getMessage() != null && !message.getMessage().equals(fLastMessage)) {
-			fLastMessage = message.getMessage();
-			sync.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					boolean isLocal = fHandle.getText().equals(
-							message.getHandle());
-					messageComposite.addItem(new ChatElement(fLastMessage,
-							message.getHandle(), new Date(), isLocal));
-				}
-			});
+		// do not handle null mesasge
+		if (message == null) {
+			System.err.println("Skipping null message instance");
+			return;
+		} else if (message.getMessage() == null) {
+			System.err.println("Skipping null message");
+			return;
+		} else if (message.equals(fLastMessage)) {
+			System.err.println("Skipping identical message");
+			return;
 		}
-
+		
+		fLastMessage = message;
+		sync.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				boolean isLocal = fHandle.getText().equals(
+						message.getHandle());
+				messageComposite.addItem(new ChatElement(fLastMessage.getMessage(),
+						message.getHandle(), new Date(), isLocal));
+			}
+		});
 	}
 
 	@Override

@@ -357,7 +357,7 @@ public class ChatPart implements IPointToPointChatListener {
 
 	@Override
 	public synchronized void messageRecevied(final IChatMessage message) {
-		if (!message.getMessage().equals(fLastMessage)) {
+		if (message.getMessage() != null && !message.getMessage().equals(fLastMessage)) {
 			fLastMessage = message.getMessage();
 			sync.asyncExec(new Runnable() {
 				@Override

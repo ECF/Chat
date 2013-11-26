@@ -29,6 +29,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.ecf.example.chat.model.ChatMessage;
 import org.eclipse.ecf.example.chat.model.IChatMessage;
 import org.eclipse.ecf.example.chat.tracker.CentralisticChatTracker;
 import org.eclipse.ecf.example.chat.tracker.ChatTracker;
@@ -60,7 +61,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 
 public class ChatPart implements IPointToPointChatListener {
 	private Text fMessage;
-	private IChatMessage fLastMessage;
+	private IChatMessage fLastMessage = new ChatMessage("", "");
 	private Composite fStackComposite;
 	private final FormToolkit fFormToolkit = new FormToolkit(
 			Display.getDefault());

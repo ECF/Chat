@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ECF/Chat.png?branch=master)](https://travis-ci.org/ECF/Chat)
+
 # Chat
 
 A simple chat client and server that work with remote services and service discovery
